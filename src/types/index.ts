@@ -1,39 +1,88 @@
 // ============================================================
-// TYPES – zentrale Typdefinitionen für die gesamte Plattform
+// TYPES – Nur Typdefinitionen. Keine Logik, keine Imports.
+// Jedes Modul importiert von hier, aber nichts anderes.
 // ============================================================
 
+// ── Produkt-Typen ──────────────────────────────────────────
 export type ProductType = 'bot' | 'ebook' | 'whitepaper' | 'video' | 'bundle' | 'saas'
 export type PricingType = 'one_time' | 'subscription'
 export type SubscriptionInterval = 'month' | 'year'
 
+export type BotCategory =
+  | 'Programmierung'
+  | 'Recht'
+  | 'Kunst & Kreativität'
+  | 'Business & Marketing'
+  | 'Content & Text'
+  | 'Finanzen & Steuern'
+  | 'Analyse & Recherche'
+  | 'Datenwerkzeuge'
+  | 'Gesundheit & Lifestyle'
+  | 'Sprache & Übersetzung'
+  | 'Bildung'
+  | 'KI-Tools'
+  | 'Sonstiges'
+
+export type AIProvider = 'openai' | 'anthropic' | 'mistral'
+
+// ── Chat-Typen ─────────────────────────────────────────────
+export type ChatRole = 'system' | 'user' | 'assistant'
+
+export interface ChatMessage {
+  role: ChatRole
+  content: string
+  timestamp?: number
+}
+
+export interface ChatSession {
+  sessionId: string
+  botId: string
+  licenseKey: string
+  messages: ChatMessage[]
+  createdAt: string
+  lastActivity: string
+  totalMessages: number
+}
+
+// ── Bot-Konfiguration ──────────────────────────────────────
+export interface BotConfig {
+  systemPrompt: string      // NIEMALS ans Frontend senden
+  provider: AIProvider
+  model: string
+  temperature: number
+  maxTokens: number
+  welcomeMessage: string
+  placeholder: string
+  avatarIcon: string        // FontAwesome Klasse, z.B. 'fa-robot'
+  avatarColor: string       // Tailwind Gradient, z.B. 'from-indigo-500 to-purple-600'
+  streamResponse: boolean
+  contextWindow: number     // Anzahl Nachrichten im Kontext (1–20)
+}
+
+// ── Produkt ────────────────────────────────────────────────
 export interface Product {
   id: string
   name: string
   description: string
+  shortDesc: string         // 1 Satz für Karten-Ansicht
   type: ProductType
   pricingType: PricingType
-  price: number          // in Cent (z.B. 2900 = 29,00 €)
-  currency: string       // 'eur'
+  price: number             // in Cent
+  currency: string
   interval?: SubscriptionInterval
-  stripePriceId: string  // Stripe Price ID – aus Dashboard oder .dev.vars
+  stripePriceId: string
   stripeProductId: string
   features: string[]
-  category: string
-  thumbnail?: string
-  downloadUrl?: string   // nur für digitale Produkte nach Kauf sichtbar
-  botConfig?: BotConfig  // nur für Bot-Produkte
-  badge?: string         // z.B. "Bestseller", "Neu"
+  useCases: string[]
+  targetAudience: string
+  category: BotCategory
+  badge?: string
   active: boolean
+  botConfig?: BotConfig     // nur für type === 'bot'
+  downloadUrl?: string      // nur für ebook/video/whitepaper
 }
 
-export interface BotConfig {
-  systemPrompt: string
-  model: string          // z.B. "gpt-4o"
-  temperature: number
-  welcomeMessage: string
-  iframeAllowed: boolean
-}
-
+// ── Lizenz ────────────────────────────────────────────────
 export interface License {
   key: string
   productId: string
@@ -44,25 +93,31 @@ export interface License {
   pricingType: PricingType
   status: 'active' | 'cancelled' | 'expired'
   createdAt: string
-  expiresAt?: string     // null = unbegrenzt (Einmalkauf)
+  expiresAt?: string
+  totalMessages: number
+  lastChatAt?: string
 }
 
-export interface CheckoutSession {
-  productId: string
-  customerEmail: string
-  successUrl: string
-  cancelUrl: string
+// ── API Request/Response ───────────────────────────────────
+export interface ChatRequest {
+  botId: string
+  licenseKey: string
+  userMessage: string
+  sessionId?: string
 }
 
-export interface StripeWebhookEvent {
-  type: string
-  data: {
-    object: Record<string, unknown>
-  }
+export interface ChatApiResponse {
+  reply: string
+  sessionId: string
+  usage?: { totalTokens: number }
 }
 
+// ── Cloudflare Bindings ────────────────────────────────────
 export type Bindings = {
   STRIPE_SECRET_KEY: string
   STRIPE_WEBHOOK_SECRET: string
+  OPENAI_API_KEY: string
+  ANTHROPIC_API_KEY: string
+  MISTRAL_API_KEY: string
   KV: KVNamespace
 }
