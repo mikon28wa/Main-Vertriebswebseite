@@ -660,6 +660,478 @@ export const PRODUCTS: Product[] = [
     targetAudience: 'Querdenker, Unternehmer, Direkt-Kommunikatoren',
     category: 'Sonstiges', active: true
   },
+
+  // ════════════════════════════════════════════════════════
+  // NEUE BOTS – ASTRO & PERSÖNLICHKEIT
+  // ════════════════════════════════════════════════════════
+  {
+    id: 'bot-astrokarriere',
+    name: 'AstroKarriere',
+    shortDesc: 'Monatshoroskop mit Fokus Karriere & Finanzen.',
+    description: 'Erstellt personalisierte Monatshoroskope mit 70 % Fokus auf berufliche Entwicklung, Karrierechancen und Finanztipps – basierend auf Sternzeichen, Geburtsdatum und Geburtszeit.',
+    type: 'bot', pricingType: 'one_time', price: 1490, currency: 'eur',
+    stripePriceId: 'price_PLACEHOLDER_astrokarriere', stripeProductId: 'prod_PLACEHOLDER_astrokarriere',
+    features: ['Karriere-Fokus 70%', 'Persönlichkeitsanalyse', 'Günstige Zeiträume', 'Finanztipps', 'Networking-Hinweise'],
+    useCases: ['Karriereentscheidungen treffen', 'Günstige Bewerbungszeitpunkte finden', 'Monatliche Orientierung', 'Persönlichkeit verstehen'],
+    targetAudience: 'Spirituell Interessierte, Karrierebewusste, Selbstständige',
+    category: 'Gesundheit & Lifestyle', badge: 'Neu', active: true
+  },
+  {
+    id: 'bot-astrobezi',
+    name: 'AstroBezi',
+    shortDesc: 'Beziehungskompatibilität zwischen Sternzeichen analysieren.',
+    description: 'Analysiert die Kompatibilität zwischen zwei Sternzeichen in Romantik, Freundschaft und Business. Kombiniert Astrologie mit Verhaltenspsychologie für praktische Beziehungsratschläge.',
+    type: 'bot', pricingType: 'one_time', price: 1490, currency: 'eur',
+    stripePriceId: 'price_PLACEHOLDER_astrobezi', stripeProductId: 'prod_PLACEHOLDER_astrobezi',
+    features: ['Synastrie-Analyse', 'Romantik & Freundschaft & Business', 'Kommunikationsstile', 'Konfliktlösung', 'Handlungsempfehlungen'],
+    useCases: ['Beziehungskompatibilität prüfen', 'Konflikte verstehen', 'Beziehung vertiefen', 'Business-Partner einschätzen'],
+    targetAudience: 'Singles, Paare, Spirituell Interessierte',
+    category: 'Gesundheit & Lifestyle', active: true
+  },
+  {
+    id: 'bot-astromonat-liebe',
+    name: 'AstroMonat Pro',
+    shortDesc: 'Monatshoroskop – Liebe, Karriere, Gesundheit & Finanzen.',
+    description: 'Vollständiges Monatshoroskop mit personalisierten Vorhersagen für alle 4 Lebensbereiche. Inklusive Aszendent-Berechnung, Planetentransite und konkreten Glückstagen.',
+    type: 'bot', pricingType: 'one_time', price: 1490, currency: 'eur',
+    stripePriceId: 'price_PLACEHOLDER_astromonat', stripeProductId: 'prod_PLACEHOLDER_astromonat',
+    features: ['4 Lebensbereiche', 'Aszendent-Analyse', 'Planetentransite', 'Glückstage', 'Handlungsempfehlungen'],
+    useCases: ['Monatliche Planung', 'Liebesentscheidungen', 'Gesundheitsoptimierung', 'Finanzplanung'],
+    targetAudience: 'Astrologie-Fans, Suchende nach Orientierung',
+    category: 'Gesundheit & Lifestyle', active: true
+  },
+  {
+    id: 'bot-astrobeziehung',
+    name: 'AstroBeziehung',
+    shortDesc: 'Monatshoroskop für Beziehungen & persönliche Entwicklung.',
+    description: 'Spezialisiertes Monatshoroskop mit Fokus auf romantische, freundschaftliche und familiäre Beziehungen sowie inneres Wachstum – mit präzisen Transite-Analysen.',
+    type: 'bot', pricingType: 'one_time', price: 1490, currency: 'eur',
+    stripePriceId: 'price_PLACEHOLDER_astrobeziehung', stripeProductId: 'prod_PLACEHOLDER_astrobeziehung',
+    features: ['Beziehungs-Fokus', 'Venus & Mond Transite', 'Familiendynamiken', 'Selbstwachstum', 'Konkrete Ratschläge'],
+    useCases: ['Beziehungsentscheidungen', 'Persönlichkeitsentwicklung', 'Spirituelles Wachstum', 'Konfliktlösung'],
+    targetAudience: 'Menschen in Beziehungen, Selbstentwickler',
+    category: 'Gesundheit & Lifestyle', active: true
+  },
+
+  // ════════════════════════════════════════════════════════
+  // NEUE BOTS – RECHT & COMPLIANCE (ERWEITERUNG)
+  // ════════════════════════════════════════════════════════
+  {
+    id: 'bot-klauseldefender',
+    name: 'KlauselDefender',
+    shortDesc: 'Vertragsklauseln juristisch wasserdicht verteidigen.',
+    description: 'Erstellt in Sekunden prägnante, juristisch fundierte Verteidigungstexte für Vertragsklauseln – immer als ein überzeugender Satz für Gegenseiten mit hohem juristischen Niveau.',
+    type: 'bot', pricingType: 'one_time', price: 2900, currency: 'eur',
+    stripePriceId: 'price_PLACEHOLDER_klausel', stripeProductId: 'prod_PLACEHOLDER_klausel',
+    features: ['Juristisch präzise', 'Einzeiliger Textbaustein', 'Risikoallokation', 'Keine Quellen nötig', 'Prompt-Injection-Schutz'],
+    useCases: ['Redline-Kommentare verteidigen', 'Vertragsverhandlungen', 'Haftungsklauseln absichern', 'Geheimhaltung verteidigen'],
+    targetAudience: 'Rechtsanwälte, Legal Teams, Vertragsmanager',
+    category: 'Recht', badge: 'Pro', active: true
+  },
+  {
+    id: 'bot-aktenauswerter',
+    name: 'Aktenauswerter',
+    shortDesc: 'Juristische Akten strukturiert zusammenfassen.',
+    description: 'Erstellt strukturierte Aktenauszüge für Gerichtsverfahren: chronologische Verfahrenshistorie, tabellarische Gegenüberstellung der Parteipositionen, Beweismittel-Übersicht.',
+    type: 'bot', pricingType: 'one_time', price: 3900, currency: 'eur',
+    stripePriceId: 'price_PLACEHOLDER_akten', stripeProductId: 'prod_PLACEHOLDER_akten',
+    features: ['Chronologische Analyse', 'Parteienvergleich Tabelle', 'Beweismittel-Übersicht', 'DSGVO-konform', 'Anwaltsgeheimnis'],
+    useCases: ['Aktenüberblick schaffen', 'Mandantenbesprechung vorbereiten', 'Sachverhalt strukturieren', 'Verfahrenshistorie aufbereiten'],
+    targetAudience: 'Rechtsanwälte, Juristen, Richter',
+    category: 'Recht', active: true
+  },
+  {
+    id: 'bot-hausordnung-checker',
+    name: 'HausordnungChecker',
+    shortDesc: 'Hausordnungen sozialer Einrichtungen rechtlich prüfen.',
+    description: 'Interdisziplinäre Prüfung von Hausordnungen auf rechtliche Konformität (GG, SGB, DSGVO), psychologische Auswirkungen und sozialpädagogische Aspekte für Unterkünfte und Heime.',
+    type: 'bot', pricingType: 'one_time', price: 3900, currency: 'eur',
+    stripePriceId: 'price_PLACEHOLDER_hausordnung', stripeProductId: 'prod_PLACEHOLDER_hausordnung',
+    features: ['Rechtliche Prüfung GG/SGB/DSGVO', 'Psychologische Analyse', 'Sozialpädagogik', 'Verhältnismäßigkeit', 'Verbesserungsvorschläge'],
+    useCases: ['Hausordnung rechtssicher machen', 'Compliance-Prüfung', 'Bewohnerschutz', 'Einrichtungsoptimierung'],
+    targetAudience: 'Sozialeinrichtungen, Behörden, Sozialarbeiter, Juristen',
+    category: 'Recht', active: true
+  },
+  {
+    id: 'bot-eurecht',
+    name: 'EURechtGPT',
+    shortDesc: 'EU-Recht, EuGH-Urteile und EU-Rechtsprechung erklären.',
+    description: 'Kompetenter Assistent für EU-Primärrecht (EUV, AEUV), Sekundärrecht (DSGVO, Verbraucherschutz) und EuGH-Rechtsprechung. Mit EUR-Lex und CURIA als Datengrundlage.',
+    type: 'bot', pricingType: 'one_time', price: 2900, currency: 'eur',
+    stripePriceId: 'price_PLACEHOLDER_eurecht', stripeProductId: 'prod_PLACEHOLDER_eurecht',
+    features: ['EU-Primärrecht', 'EuGH-Urteile', 'DSGVO-Expertise', 'Wettbewerbsrecht', 'Verbraucherschutz'],
+    useCases: ['EU-Recht verstehen', 'DSGVO-Fragen klären', 'Grenzüberschreitende Rechte', 'Compliance EU-weit'],
+    targetAudience: 'Unternehmen, Juristen, EU-Bürger, Compliance-Manager',
+    category: 'Recht', active: true
+  },
+
+  // ════════════════════════════════════════════════════════
+  // NEUE BOTS – ANALYSE & SEO
+  // ════════════════════════════════════════════════════════
+  {
+    id: 'bot-crawling-auditor',
+    name: 'CrawlingAuditor',
+    shortDesc: 'Technisches SEO-Audit: Crawling, Indexierung, Linkstruktur.',
+    description: 'Autonomer Auditor für robots.txt, Sitemaps, Statuscodes, Canonicals, hreflang und interne Linkarchitektur. Erstellt PDF-fertige Berichte mit priorisierten Handlungsempfehlungen.',
+    type: 'bot', pricingType: 'subscription', price: 2900, currency: 'eur', interval: 'month',
+    stripePriceId: 'price_PLACEHOLDER_crawling', stripeProductId: 'prod_PLACEHOLDER_crawling',
+    features: ['robots.txt Analyse', 'Sitemap-Prüfung', 'Statuscode-Report', 'Canonical-Konflikte', 'PDF-Report-fertig'],
+    useCases: ['SEO-Audit durchführen', 'Indexierungsprobleme lösen', 'Weiterleitungsketten finden', 'Orphan Pages aufdecken'],
+    targetAudience: 'SEO-Experten, Webmaster, Digital-Agenturen',
+    category: 'Analyse & Recherche', badge: 'Pro', active: true
+  },
+  {
+    id: 'bot-wcca',
+    name: 'WebsiteCoverageAgent',
+    shortDesc: 'Website-Crawl & Coverage-Analyse als strukturiertes JSON.',
+    description: 'Erstellt vollständige Website-Snapshots und bewertet die Coverage. Gibt strukturiertes JSON zurück für weitere Pipeline-Verarbeitung (Kategorie-Agent, Microagent).',
+    type: 'bot', pricingType: 'one_time', price: 3900, currency: 'eur',
+    stripePriceId: 'price_PLACEHOLDER_wcca', stripeProductId: 'prod_PLACEHOLDER_wcca',
+    features: ['JSON-Only Output', 'Coverage-Bewertung', 'Pipeline-kompatibel', 'Anti-Injection', 'Compliance-Pipeline'],
+    useCases: ['Website-Struktur erfassen', 'Coverage-Lücken finden', 'Automatisierte Audits', 'Compliance-Checks'],
+    targetAudience: 'Entwickler, SEO-Agenturen, Compliance-Teams',
+    category: 'Analyse & Recherche', active: true
+  },
+  {
+    id: 'bot-textqual-analyzer',
+    name: 'TextQualAnalyzer',
+    shortDesc: 'Textqualität analysieren, bewerten und verbessern (V3).',
+    description: 'Dreiteiliges Textqualitäts-System: Analyzer bewertet, Optimizer überarbeitet, Plagiat-Checker prüft. Anti-Halluzination, RAG-gestützt, Manus AI kompatibel.',
+    type: 'bot', pricingType: 'subscription', price: 2900, currency: 'eur', interval: 'month',
+    stripePriceId: 'price_PLACEHOLDER_textqual', stripeProductId: 'prod_PLACEHOLDER_textqual',
+    features: ['Qualitätsstufen 1-6', 'Analyzer + Optimizer', 'Plagiat-Check', 'Anti-Injection Schutz', 'SEO-Optimierung'],
+    useCases: ['Blogbeiträge verbessern', 'Marketing-Texte optimieren', 'Plagiate prüfen', 'Landingpage-Qualität steigern'],
+    targetAudience: 'Texter, Content-Manager, SEO-Spezialisten, Agenturen',
+    category: 'Content & Text', badge: 'Bestseller', active: true
+  },
+  {
+    id: 'bot-faktenfokus',
+    name: 'FaktenFokusPro',
+    shortDesc: 'Faktenbasierte Antworten im 3-Perspektiven-Schema.',
+    description: 'Beantwortet jede Frage im dreistufigen Schema: Ich-Perspektive (Recherche), Fachexperten-Perspektive, Zusammengeführte Schlussfolgerung. Keine Halluzinationen.',
+    type: 'bot', pricingType: 'one_time', price: 1900, currency: 'eur',
+    stripePriceId: 'price_PLACEHOLDER_fakten', stripeProductId: 'prod_PLACEHOLDER_fakten',
+    features: ['3-Perspektiven-Methode', 'Quellenhinweise', 'Anti-Halluzination', 'Fachliche Tiefe', 'Praxisnahe Schlussfolgerung'],
+    useCases: ['Recherche fundieren', 'Komplexe Themen verstehen', 'Faktencheck', 'Entscheidungen absichern'],
+    targetAudience: 'Journalisten, Forscher, Entscheider, Wissensarbeiter',
+    category: 'Analyse & Recherche', active: true
+  },
+  {
+    id: 'bot-fakeshop-checker',
+    name: 'FakeShopChecker',
+    shortDesc: 'Online-Shops auf Betrug und Seriosität prüfen.',
+    description: 'Systematische Prüfung von Online-Shops auf Fake-Eigenschaften: WHOIS, SSL, Impressum, Reputations-Check, Bewertungsmuster. Risikoscore 0-100 mit konkreten Handlungsempfehlungen.',
+    type: 'bot', pricingType: 'one_time', price: 990, currency: 'eur',
+    stripePriceId: 'price_PLACEHOLDER_fakeshop', stripeProductId: 'prod_PLACEHOLDER_fakeshop',
+    features: ['Risikoscore 0-100', 'WHOIS & SSL Check', 'Bewertungsanalyse', 'Zahlungsrisiko', 'Quellenbelege'],
+    useCases: ['Shop vor Kauf prüfen', 'Betrug erkennen', 'Sicher online kaufen', 'Verbraucherschutz'],
+    targetAudience: 'Online-Käufer, Verbraucherschützer, Unternehmen',
+    category: 'Analyse & Recherche', badge: 'Neu', active: true
+  },
+  {
+    id: 'bot-site-meldeassistent',
+    name: 'SiteMeldeAssistent',
+    shortDesc: 'Websites wegen illegaler Inhalte korrekt melden.',
+    description: 'Führt durch den gesamten Meldeprozess bei problematischen Websites: ermittelt die richtige Meldestelle (Google, Behörden, Plattformen), erklärt benötigte Informationen.',
+    type: 'bot', pricingType: 'one_time', price: 990, currency: 'eur',
+    stripePriceId: 'price_PLACEHOLDER_sitemeldeassistent', stripeProductId: 'prod_PLACEHOLDER_sitemeldeassistent',
+    features: ['Meldestellen-Ermittlung', 'Beweissicherung', 'Schritt-für-Schritt', 'International', '95%+ Genauigkeit'],
+    useCases: ['Fake-Shop melden', 'Phishing melden', 'Illegale Inhalte anzeigen', 'Urheberrechtsverletzung melden'],
+    targetAudience: 'Verbraucher, Unternehmen, Rechteinhaber',
+    category: 'Analyse & Recherche', active: true
+  },
+  {
+    id: 'bot-ki-straftat',
+    name: 'KI-StrafrechtFakten',
+    shortDesc: 'Faktenbasierte Straftatverarbeitung mit KI.',
+    description: 'Sachliche, faktenbasierte Analyse von strafrechtlichen Situationen. Kombiniert öffentliches Strafrecht mit KI-Analyse für Ermittler, Juristen und Sicherheitsbehörden.',
+    type: 'bot', pricingType: 'one_time', price: 3900, currency: 'eur',
+    stripePriceId: 'price_PLACEHOLDER_kistrafrechtfakten', stripeProductId: 'prod_PLACEHOLDER_kistrafrechtfakten',
+    features: ['Faktenbasis', 'StGB & StPO Referenzen', 'Sachliche Analyse', 'Keine Spekulationen', 'Ermittlungsunterstützung'],
+    useCases: ['Sachverhalte strukturieren', 'Rechtliche Einordnung', 'Ermittlungsansätze', 'Fallanalyse'],
+    targetAudience: 'Juristen, Ermittler, Sicherheitsbehörden',
+    category: 'Recht', active: true
+  },
+
+  // ════════════════════════════════════════════════════════
+  // NEUE BOTS – BUSINESS & MARKETING (ERWEITERUNG)
+  // ════════════════════════════════════════════════════════
+  {
+    id: 'bot-guerrilla-marketing',
+    name: 'GuerrillaMarketing',
+    shortDesc: 'Extreme, virale Guerrilla-Marketing-Kampagnen erstellen.',
+    description: 'Entwickelt provokante, grenzenüberschreitende Online-Marketing-Kampagnen für maximale Aufmerksamkeit. Vollständige Inhalte für Facebook, Instagram, TikTok, X, Snapchat und Website.',
+    type: 'bot', pricingType: 'one_time', price: 2900, currency: 'eur',
+    stripePriceId: 'price_PLACEHOLDER_guerrilla', stripeProductId: 'prod_PLACEHOLDER_guerrilla',
+    features: ['Viral-Strategie', 'Multi-Plattform Content', 'Provokante Ideen', 'Vollständige Kampagne', 'Emotionale Wirkung'],
+    useCases: ['Brand Awareness steigern', 'Virale Kampagne starten', 'Engagement maximieren', 'Aufmerksamkeit erregen'],
+    targetAudience: 'Marketer, Startups, Kreativagenturen, Brand Manager',
+    category: 'Business & Marketing', badge: 'Neu', active: true
+  },
+  {
+    id: 'bot-vertriebsrep',
+    name: 'VertriebsRepBot',
+    shortDesc: 'Sales-Development-Bot für Erstkontakte und Lead-Qualifizierung.',
+    description: 'Professioneller Sales-Development-Representative für WhatsApp und Messenger. Qualifiziert Leads, pitcht das Produkt, führt zu Terminen – höflich, prägnant, personalisiert.',
+    type: 'bot', pricingType: 'subscription', price: 2900, currency: 'eur', interval: 'month',
+    stripePriceId: 'price_PLACEHOLDER_vertriebsrep', stripeProductId: 'prod_PLACEHOLDER_vertriebsrep',
+    features: ['Lead-Qualifizierung', 'Messenger-optimiert', 'DSGVO-konform', 'Produkt-Pitching', 'Terminvereinbarung'],
+    useCases: ['Erstkontakte qualifizieren', 'Leads warmhalten', 'Produkt vorstellen', 'Termine vereinbaren'],
+    targetAudience: 'Vertriebsteams, Startups, KMUs, Coaches',
+    category: 'Business & Marketing', active: true
+  },
+  {
+    id: 'bot-fiverr-gig',
+    name: 'FiverrGigAssistent',
+    shortDesc: 'Perfekte Fiverr-Gigs Schritt für Schritt erstellen.',
+    description: 'Führt durch alle Felder der Fiverr-Gig-Erstellung: Titel, Kategorie, Tags, Beschreibung, Pakete, FAQs. Validiert Zeichenlimits und gibt konkrete Verbesserungsvorschläge.',
+    type: 'bot', pricingType: 'one_time', price: 1900, currency: 'eur',
+    stripePriceId: 'price_PLACEHOLDER_fiverrg', stripeProductId: 'prod_PLACEHOLDER_fiverrg',
+    features: ['Gig-Struktur komplett', 'SEO-Tags Optimierung', 'Paket-Preisgestaltung', 'Validation', 'FAQ-Erstellung'],
+    useCases: ['Ersten Gig erstellen', 'Bestehenden Gig optimieren', 'Konversionsrate steigern', 'Ranking verbessern'],
+    targetAudience: 'Freiberufler, Designer, Texter, Entwickler auf Fiverr',
+    category: 'Business & Marketing', active: true
+  },
+  {
+    id: 'bot-fiverr-berater',
+    name: 'FiverrBerater',
+    shortDesc: 'Freelancer auf Fiverr auswählen und Projekte managen.',
+    description: 'Experte für Fiverr-Plattformnutzung: Verkäufer-Bewertung, Projektstrukturierung, Kommunikationsanleitungen, Gebührenstruktur, Qualitätssicherung.',
+    type: 'bot', pricingType: 'one_time', price: 1900, currency: 'eur',
+    stripePriceId: 'price_PLACEHOLDER_fiverrberater', stripeProductId: 'prod_PLACEHOLDER_fiverrberater',
+    features: ['Verkäufer-Bewertung', 'Projektstruktur', 'Kostenoptimierung', 'Risikominimierung', 'Kommunikationsleitfaden'],
+    useCases: ['Richtigen Freelancer finden', 'Projekt erfolgreich abwickeln', 'Kosten sparen', 'Qualität sichern'],
+    targetAudience: 'Unternehmen, Auftraggeber, Projekte-Manager',
+    category: 'Business & Marketing', active: true
+  },
+  {
+    id: 'bot-recruiter-sofi',
+    name: 'RecruiterSofi',
+    shortDesc: 'KI-Recruiterin für WhatsApp-Kandidatenbegleitung.',
+    description: 'Sofi – erfahrene KI-Recruiterin begleitet Kandidaten vom Erstkontakt bis zum Vorstellungsgespräch. Dokumenten-Upload, Fragenkatalog, DSGVO-konform.',
+    type: 'bot', pricingType: 'subscription', price: 3900, currency: 'eur', interval: 'month',
+    stripePriceId: 'price_PLACEHOLDER_recruitersofi', stripeProductId: 'prod_PLACEHOLDER_recruitersofi',
+    features: ['Kandidaten-Begleitung', 'Dokument-Upload', 'Fragenkatalog', 'DSGVO-konform', 'WhatsApp-Stil'],
+    useCases: ['Bewerber vorqualifizieren', 'Bewerbungsprozess automatisieren', 'HR entlasten', 'Kandidaten informieren'],
+    targetAudience: 'HR-Abteilungen, Personalvermittler, Recruiter',
+    category: 'Business & Marketing', badge: 'Pro', active: true
+  },
+  {
+    id: 'bot-support-template',
+    name: 'SupportBot-Template',
+    shortDesc: 'Anpassbarer Kundensupport-Bot für jedes Unternehmen.',
+    description: 'Professioneller Support-Bot-Template für WhatsApp/Messenger. Löst Kundenprobleme, bewahrt freundlichen Ton, hält sich auf Topic. DSGVO-konform und anpassbar.',
+    type: 'bot', pricingType: 'subscription', price: 2900, currency: 'eur', interval: 'month',
+    stripePriceId: 'price_PLACEHOLDER_supporttemplate', stripeProductId: 'prod_PLACEHOLDER_supporttemplate',
+    features: ['Anpassbares Template', 'Messenger-optimiert', 'DSGVO-konform', 'Freundlich & kompetent', 'Topic-fokussiert'],
+    useCases: ['Kundensupport automatisieren', 'FAQ-Beantwortung', 'Produkt-Support', 'Aftersales-Service'],
+    targetAudience: 'Unternehmen aller Branchen, E-Commerce, SaaS',
+    category: 'Business & Marketing', active: true
+  },
+
+  // ════════════════════════════════════════════════════════
+  // NEUE BOTS – FINANZEN & STEUERN (ERWEITERUNG)
+  // ════════════════════════════════════════════════════════
+  {
+    id: 'bot-steuerpausch',
+    name: 'SteuerPauschBot',
+    shortDesc: 'Alle relevanten Steuerpauschbeträge für deine Situation finden.',
+    description: 'Interaktiver Chatbot für deutsche Steuerpauschbeträge. Ermittelt durch gezieltes Fragen alle relevanten Pauschalen (Arbeitnehmer, Homeoffice, Behinderung, Kinder, Ehrenamt) ohne Belege.',
+    type: 'bot', pricingType: 'one_time', price: 1490, currency: 'eur',
+    stripePriceId: 'price_PLACEHOLDER_steuerpausch', stripeProductId: 'prod_PLACEHOLDER_steuerpausch',
+    features: ['Alle Pauschbeträge 2025', 'Adaptiver Dialog', 'Kategorisierte Ausgabe', 'Kein Anwalt nötig', 'Laienverständlich'],
+    useCases: ['Steuererstattung maximieren', 'Pauschalen kennen', 'Steuererklärung optimieren', 'Homeoffice-Pauschale'],
+    targetAudience: 'Angestellte, Selbstständige, Rentner, Familien',
+    category: 'Finanzen & Steuern', badge: 'Neu', active: true
+  },
+  {
+    id: 'bot-finanzplan-assistent',
+    name: 'FinanzplanAssistent',
+    shortDesc: 'Machbarkeitsstudien und Businesspläne mit Finanzprognosen.',
+    description: 'Erstellt professionelle Machbarkeitsstudien und Geschäftspläne mit SWOT-Analyse, Marktanalyse, Konkurrenzanalyse und Finanzprognosen – auf BlackRock-Niveau.',
+    type: 'bot', pricingType: 'one_time', price: 4900, currency: 'eur',
+    stripePriceId: 'price_PLACEHOLDER_finanzplan', stripeProductId: 'prod_PLACEHOLDER_finanzplan',
+    features: ['Machbarkeitsstudie', 'SWOT-Analyse', 'Marktanalyse', 'Finanzprognosen', 'Investorenreport'],
+    useCases: ['Businessplan erstellen', 'Investoren überzeugen', 'Marktpotenzial prüfen', 'Finanzierungsantrag'],
+    targetAudience: 'Gründer, Unternehmer, Investoren, CFOs',
+    category: 'Finanzen & Steuern', active: true
+  },
+  {
+    id: 'bot-finance-resume',
+    name: 'FinanceResumeBot',
+    shortDesc: 'ATS-optimierte Lebensläufe für Finance-Berufe.',
+    description: 'Erstellt ATS-optimierte, professionelle Lebensläufe für Investment Banking, Financial Analysis, Risk Management, ESG-Reporting. Mit automatischer Keyword-Analyse.',
+    type: 'bot', pricingType: 'one_time', price: 2900, currency: 'eur',
+    stripePriceId: 'price_PLACEHOLDER_financeresume', stripeProductId: 'prod_PLACEHOLDER_financeresume',
+    features: ['ATS-optimiert', 'Finance-Keyword-Analyse', 'Investment Banking Focus', 'ESG-Reporting', 'Word-kompatibel'],
+    useCases: ['Lebenslauf Finance', 'Investment-Banking Bewerbung', 'ATS-Optimierung', 'Karrierewechsel Finance'],
+    targetAudience: 'Finance-Professionals, Berufseinsteiger, Karrierewechsler',
+    category: 'Finanzen & Steuern', active: true
+  },
+
+  // ════════════════════════════════════════════════════════
+  // NEUE BOTS – KUNST & KREATIVITÄT (ERWEITERUNG)
+  // ════════════════════════════════════════════════════════
+  {
+    id: 'bot-abstractartgenie',
+    name: 'AbstractArtGenie',
+    shortDesc: 'Abstrakte Kunstwerke durch geführten Dialog erschaffen.',
+    description: 'Führt durch einen kreativen Dialog zur Erschaffung einzigartiger abstrakter Kunst. Erfasst Stimmung, Farben, Formen, Textur und Dynamik für perfekte Bild-Prompts.',
+    type: 'bot', pricingType: 'one_time', price: 1490, currency: 'eur',
+    stripePriceId: 'price_PLACEHOLDER_abstractart', stripeProductId: 'prod_PLACEHOLDER_abstractart',
+    features: ['Geführter Kreativprozess', 'Stimmungsanalyse', 'Farb- & Formauswahl', 'KI-Prompt-Generierung', 'Einzigartige Werke'],
+    useCases: ['Kunst-Prompts erstellen', 'Abstract Art Inspiration', 'NFT-Konzepte', 'Innenraumdekoration'],
+    targetAudience: 'Kreative, Künstler, NFT-Creator, Designer',
+    category: 'Kunst & Kreativität', badge: 'Neu', active: true
+  },
+  {
+    id: 'bot-streetart',
+    name: 'StreetArtArtist',
+    shortDesc: 'Professionelle Street-Art-Prompts für KI-Bildgeneratoren.',
+    description: 'Erstellt cineastische, photorealistische Street-Art-Prompts mit urbaner Atmosphäre, Graffiti-Stil und dramatischer Beleuchtung – inspiriert von Banksy und Kobra.',
+    type: 'bot', pricingType: 'one_time', price: 1490, currency: 'eur',
+    stripePriceId: 'price_PLACEHOLDER_streetart', stripeProductId: 'prod_PLACEHOLDER_streetart',
+    features: ['Banksy-Stil', 'Spray-Paint Ästhetik', 'Urbane Atmosphäre', 'Photorealistische Prompts', 'Cinematic Tone'],
+    useCases: ['Street Art generieren', 'Mural-Konzepte', 'Urban Art NFTs', 'Stadtbild-Visualisierung'],
+    targetAudience: 'Künstler, Grafiker, NFT-Creator, Agenturen',
+    category: 'Kunst & Kreativität', active: true
+  },
+  {
+    id: 'bot-artmajeur-analyse',
+    name: 'ArtmajeurBildAnalyse',
+    shortDesc: 'Kunstwerke für Artmajeur.com professionell analysieren.',
+    description: 'Analysiert Kunstwerke für das Artmajeur-Plattform-Upload: Stil, Technik, Komposition, Symbolik und verkaufsfördernde Beschreibung in mehreren Sprachen.',
+    type: 'bot', pricingType: 'one_time', price: 1900, currency: 'eur',
+    stripePriceId: 'price_PLACEHOLDER_artmajeur', stripeProductId: 'prod_PLACEHOLDER_artmajeur',
+    features: ['Kunstwerk-Analyse', 'Mehrsprachig', 'Verkaufsbeschreibung', 'Stil-Erkennung', 'Plattform-optimiert'],
+    useCases: ['Kunstwerk beschreiben', 'Artmajeur-Upload vorbereiten', 'Galerie-Texte', 'Kunstkatalog erstellen'],
+    targetAudience: 'Bildende Künstler, Galerien, Kunstverkäufer',
+    category: 'Kunst & Kreativität', active: true
+  },
+  {
+    id: 'bot-abstract-prompts',
+    name: 'AbstraktBildPrompts',
+    shortDesc: 'Professionelle Prompts für abstrakte KI-Bilder.',
+    description: 'Erstellt qualitativ hochwertige, detaillierte Prompts für abstrakte KI-Bildgenerierung. Von einfachen Wirbeln bis zu komplexen psychedelischen Kompositionen.',
+    type: 'bot', pricingType: 'one_time', price: 990, currency: 'eur',
+    stripePriceId: 'price_PLACEHOLDER_abstractprompts', stripeProductId: 'prod_PLACEHOLDER_abstractprompts',
+    features: ['Midjourney & DALL-E', 'Detaillierte Beschreibungen', 'Farbpaletten', 'Stil-Variationen', 'DE & EN'],
+    useCases: ['KI-Kunstwerke generieren', 'Bildprompts verbessern', 'Stil experimenterieren', 'Kreative Inspiration'],
+    targetAudience: 'KI-Künstler, Kreative, Content-Creator',
+    category: 'Kunst & Kreativität', active: true
+  },
+
+  // ════════════════════════════════════════════════════════
+  // NEUE BOTS – SPRACHE & TOOLS
+  // ════════════════════════════════════════════════════════
+  {
+    id: 'bot-papagent',
+    name: 'Papagent',
+    shortDesc: 'Automatische Rechtschreibkorrektur für deutsche Texte.',
+    description: 'Korrigiert deutsche Texte automatisch: Rechtschreibung, Grammatik, Interpunktion und Typografie. Gibt NUR den korrigierten Text zurück – kein Kommentar, kein Smalltalk.',
+    type: 'bot', pricingType: 'subscription', price: 990, currency: 'eur', interval: 'month',
+    stripePriceId: 'price_PLACEHOLDER_papagent', stripeProductId: 'prod_PLACEHOLDER_papagent',
+    features: ['Rechtschreibung & Grammatik', 'Interpunktion', 'Typografie', 'Code-safe', 'Kein Kommentar'],
+    useCases: ['E-Mails korrigieren', 'Texte schnell prüfen', 'Tippfehler beheben', 'Professionelle Kommunikation'],
+    targetAudience: 'Alle deutschsprachigen Nutzer, Texter, Geschäftsleute',
+    category: 'Sprache & Übersetzung', active: true
+  },
+  {
+    id: 'bot-etsy-latam',
+    name: 'EtsyLATAM',
+    shortDesc: 'Produkte für lateinamerikanischen Etsy-Markt lokalisieren.',
+    description: 'Übersetzt und lokalisiert Produktbeschreibungen aus jeder Sprache ins Lateinamerikanische Spanisch (Neutral). SEO-optimiert, verkaufsstark, mit 10 Tags.',
+    type: 'bot', pricingType: 'one_time', price: 1900, currency: 'eur',
+    stripePriceId: 'price_PLACEHOLDER_etsylatam', stripeProductId: 'prod_PLACEHOLDER_etsylatam',
+    features: ['LATAM-Spanisch', 'SEO-Titel', 'Verkaufs-Hooks', 'Feature-Bullets', '10 SEO-Tags'],
+    useCases: ['Etsy-Shop LATAM expandieren', 'Produktbeschreibungen übersetzen', 'SEO für Spanisch', 'Markt-Lokalisierung'],
+    targetAudience: 'Etsy-Seller, Digital-Produkt-Händler, Shopbetreiber',
+    category: 'Sprache & Übersetzung', badge: 'Neu', active: true
+  },
+  {
+    id: 'bot-systemprompt-formatierer',
+    name: 'SystemPromptFormatierer',
+    shortDesc: 'Systemprompts automatisch in Markdown formatieren.',
+    description: 'Wandelt Copy-Paste-Eingaben von Systemprompts in saubere Markdown-Dokumente mit YAML-Metablock um. Strukturiert in Systemrolle, Zielsetzung, Do\'s, Don\'ts, Beispiele.',
+    type: 'bot', pricingType: 'one_time', price: 1490, currency: 'eur',
+    stripePriceId: 'price_PLACEHOLDER_spformatierer', stripeProductId: 'prod_PLACEHOLDER_spformatierer',
+    features: ['YAML-Metablock', 'Markdown-Struktur', 'Auto-Tagging', 'Sektionen-Erkennung', 'Archivierungsformat'],
+    useCases: ['Prompts dokumentieren', 'Prompt-Bibliothek aufbauen', 'Team-Sharing', 'Versionierung'],
+    targetAudience: 'Prompt-Engineer, KI-Teams, Entwickler',
+    category: 'KI-Tools', active: true
+  },
+  {
+    id: 'bot-blog-autor',
+    name: 'BlogAutor',
+    shortDesc: 'Fundierte, gut lesbare Blogbeiträge aus Quellen erstellen.',
+    description: 'Erstellt ansprechende, fachlich fundierte Blogbeiträge aus bereitgestellten Quellen. RAG-gestützt, Anti-Halluzination, mit überraschenden und kontraintuitiven Erkenntnissen.',
+    type: 'bot', pricingType: 'subscription', price: 1900, currency: 'eur', interval: 'month',
+    stripePriceId: 'price_PLACEHOLDER_blogautor', stripeProductId: 'prod_PLACEHOLDER_blogautor',
+    features: ['RAG-gestützt', 'Anti-Halluzination', 'Listenstruktur', 'SEO-Überschriften', 'Chain-of-Thought'],
+    useCases: ['Blogartikel schreiben', 'Content-Marketing', 'Fachbeiträge erstellen', 'Content-Bibliothek aufbauen'],
+    targetAudience: 'Blogger, Content-Manager, Marketing-Teams, Coaches',
+    category: 'Content & Text', active: true
+  },
+  {
+    id: 'bot-legalassist',
+    name: 'LegalAssistGPT',
+    shortDesc: 'Rechtsfragen zu Wirtschaft, Arbeitsrecht und Datenschutz.',
+    description: 'KI-Rechtsassistent für Wirtschaftsrecht, Arbeitsrecht/HR, geistiges Eigentum, Datenschutz und Urheberrecht. Mit Gesetzesreferenzen und Handlungsempfehlungen.',
+    type: 'bot', pricingType: 'subscription', price: 2900, currency: 'eur', interval: 'month',
+    stripePriceId: 'price_PLACEHOLDER_legalassist', stripeProductId: 'prod_PLACEHOLDER_legalassist',
+    features: ['Wirtschaftsrecht', 'DSGVO-Expertise', 'Geistiges Eigentum', 'Gesetzesreferenzen', 'Handlungsempfehlungen'],
+    useCases: ['Vertragsrecht', 'DSGVO-Fragen', 'IP-Schutz', 'Arbeitsrechtsfragen', 'Compliance'],
+    targetAudience: 'Unternehmen, Startups, KMUs, HR-Manager',
+    category: 'Recht', active: true
+  },
+  {
+    id: 'bot-ki-prozessoptimierung',
+    name: 'KI-ProzessOptimierung',
+    shortDesc: 'Digitale Prozesse mit KI Schritt für Schritt optimieren.',
+    description: 'Hochspezialisierter Assistent für digitale Prozessoptimierung. Erstellt detaillierte Schritt-für-Schritt-Anleitungen zur KI-Integration in Geschäftsprozesse.',
+    type: 'bot', pricingType: 'subscription', price: 3900, currency: 'eur', interval: 'month',
+    stripePriceId: 'price_PLACEHOLDER_kiprozess', stripeProductId: 'prod_PLACEHOLDER_kiprozess',
+    features: ['Prozessanalyse', 'KI-Integration', 'Automatisierungsplan', 'ROI-Berechnung', 'Schritt-für-Schritt'],
+    useCases: ['Prozesse automatisieren', 'KI in Unternehmen einführen', 'Effizienz steigern', 'Kosten reduzieren'],
+    targetAudience: 'Geschäftsführer, IT-Manager, Operations, Berater',
+    category: 'Business & Marketing', active: true
+  },
+  {
+    id: 'bot-textanalyse',
+    name: 'TextanalyseAssistent',
+    shortDesc: 'Literarische Textanalysen strukturiert erstellen.',
+    description: 'Erstellt vollständige Textanalysen mit Einleitung, Inhaltsanalyse, Struktur und Sprachanalyse. Für alle Textsorten: Gedichte, Prosa, Dramen, Sachtexte.',
+    type: 'bot', pricingType: 'one_time', price: 1490, currency: 'eur',
+    stripePriceId: 'price_PLACEHOLDER_textanalyse', stripeProductId: 'prod_PLACEHOLDER_textanalyse',
+    features: ['Alle Textsorten', 'Einleitung-Hauptteil-Schluss', 'Sprachanalyse', 'Strukturanalyse', 'Epochenzuordnung'],
+    useCases: ['Schulaufsatz', 'Universitätsarbeit', 'Literaturanalyse', 'Gedichtinterpretation'],
+    targetAudience: 'Schüler, Studierende, Deutschlehrer',
+    category: 'Bildung', active: true
+  },
+  {
+    id: 'bot-rainer-coding',
+    name: 'RainerCodingAssistent',
+    shortDesc: 'KI-Programmierassistent für VS Code und Workspace.',
+    description: 'Professioneller Coding-Assistent spezialisiert auf VS Code und Linux. Erklärt Code, findet Bugs, erstellt Tests und schreibt Pseudocode. Kompakt und präzise.',
+    type: 'bot', pricingType: 'subscription', price: 1900, currency: 'eur', interval: 'month',
+    stripePriceId: 'price_PLACEHOLDER_rainercoding', stripeProductId: 'prod_PLACEHOLDER_rainercoding',
+    features: ['VS Code Integration', 'Bug-Fixing', 'Unit-Test Generierung', 'Pseudocode', 'Linux-Befehle'],
+    useCases: ['Code erklären', 'Fehler finden', 'Tests schreiben', 'Neues Projekt scaffolden'],
+    targetAudience: 'Entwickler, Programmierer, Software-Ingenieure',
+    category: 'Programmierung', active: true
+  },
+  {
+    id: 'bot-sprachethik',
+    name: 'SprachEthikBot',
+    shortDesc: 'Sprache ethisch verarbeiten und niveaugerecht optimieren.',
+    description: 'Wandelt Spracheingaben in kontextgerechte Texte um. Erkennt automatisch das benötigte Sprachniveau (Schulvortrag bis Universitätsniveau) und sorgt für ethisch einwandfreie Ausgaben.',
+    type: 'bot', pricingType: 'one_time', price: 1900, currency: 'eur',
+    stripePriceId: 'price_PLACEHOLDER_sprachethik', stripeProductId: 'prod_PLACEHOLDER_sprachethik',
+    features: ['Niveauerkennung', 'Kontextsensitiv', 'Ethik-konform', 'JSON-Ausgabe', 'Bias-Minimierung'],
+    useCases: ['Vorträge niveaugerecht aufbereiten', 'Texte ethisch gestalten', 'Sprache anpassen', 'Bildungsinhalt erstellen'],
+    targetAudience: 'Pädagogen, Redner, Content-Creator, Bildungseinrichtungen',
+    category: 'Sprache & Übersetzung', active: true
+  },
 ]
 
 // ── Reine Lesefunktionen (keine Seiteneffekte) ────────────
