@@ -6,8 +6,15 @@ import { Hono } from 'hono'
 import { serveStatic } from 'hono/cloudflare-workers'
 import { logger } from 'hono/logger'
 import type { Bindings } from './types'
-import api from './routes/api'
-import { PRODUCTS, getProductById, getProductsByType, formatPrice } from './lib/products'
+
+// ── Modulare API-Routen (jede mit eigener Verantwortung) ──
+import chatRoute    from './routes/api-chat'
+import checkoutRoute from './routes/api-checkout'
+import licenseRoute  from './routes/api-license'
+import webhookRoute  from './routes/api-webhook'
+
+import { PRODUCTS, getProductById, formatPrice } from './lib/products'
+import { getBotUIConfig, getAllBotIds } from './lib/bot-registry'
 
 const app = new Hono<{ Bindings: Bindings }>()
 
@@ -16,8 +23,11 @@ app.use('*', logger())
 // Statische Dateien
 app.use('/static/*', serveStatic({ root: './' }))
 
-// API-Routen
-app.route('/api', api)
+// ── API-Routen mounten ────────────────────────────────────
+app.route('/api/chat',     chatRoute)
+app.route('/api/checkout', checkoutRoute)
+app.route('/api/license',  licenseRoute)
+app.route('/api/webhook',  webhookRoute)
 
 // ─────────────────────────────────────────────────────────
 // Shared Layout
@@ -247,51 +257,161 @@ app.get('/', (c) => {
 })
 
 // ─────────────────────────────────────────────────────────
-// KI-BOTS Übersicht
+// KI-BOTS Übersicht mit Kategorie-Filter und Suche
 // ─────────────────────────────────────────────────────────
 app.get('/bots', (c) => {
   const bots = PRODUCTS.filter(p => p.type === 'bot' && p.active)
+  const categories = ['Alle', ...new Set(bots.map(p => p.category))]
+
+  // Bot-Karten als JSON für Client-seitiges Filtern
+  const botsJson = JSON.stringify(bots.map(p => ({
+    id: p.id,
+    name: p.name,
+    shortDesc: p.shortDesc,
+    description: p.description,
+    category: p.category,
+    badge: p.badge ?? '',
+    pricingType: p.pricingType,
+    interval: p.interval ?? '',
+    price: formatPrice(p.price, p.currency),
+    features: p.features.slice(0,3),
+    avatarIcon: 'fa-robot'
+  })))
 
   const content = `
     <section class="gradient-hero text-white py-16 px-4">
       <div class="max-w-5xl mx-auto text-center">
         <i class="fas fa-robot text-5xl text-indigo-400 mb-4 block"></i>
         <h1 class="text-4xl font-extrabold mb-4">KI-Bots Bibliothek</h1>
-        <p class="text-slate-300 text-lg">Einsatzbereite Chatbots mit professionellen Systemprompts. Einmalig kaufen oder im Abo nutzen.</p>
+        <p class="text-slate-300 text-lg">Einsatzbereite Chatbots mit professionellen Systemprompts.</p>
+        <p class="text-indigo-300 font-semibold mt-2">${bots.length} Bots in ${categories.length - 1} Kategorien</p>
       </div>
     </section>
-    <section class="py-16 px-4 max-w-7xl mx-auto">
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-        ${bots.map(p => `
+
+    <section class="py-10 px-4 max-w-7xl mx-auto">
+
+      <!-- Such- und Filterleiste -->
+      <div class="bg-white rounded-2xl shadow-md p-6 mb-8 flex flex-col md:flex-row gap-4 items-center">
+        <div class="relative flex-1 w-full">
+          <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+          <input
+            type="text"
+            id="bot-search"
+            placeholder="Bot suchen (Name, Kategorie, Beschreibung)..."
+            class="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+            oninput="filterBots()"
+          >
+        </div>
+        <div class="flex items-center gap-3 text-sm text-slate-500 flex-shrink-0">
+          <span id="bot-count" class="font-semibold text-indigo-600">${bots.length}</span> Bots gefunden
+        </div>
+      </div>
+
+      <!-- Kategorie-Tabs -->
+      <div class="flex flex-wrap gap-2 mb-8" id="category-tabs">
+        ${categories.map((cat, i) => `
+          <button
+            onclick="selectCategory('${cat}')"
+            data-cat="${cat}"
+            class="cat-tab px-4 py-2 rounded-full text-sm font-medium transition-all ${i === 0 ? 'bg-indigo-600 text-white shadow' : 'bg-white text-slate-600 border border-slate-200 hover:border-indigo-300 hover:text-indigo-600'}"
+          >${cat === 'Alle' ? `<i class="fas fa-th mr-1"></i>` : ''}${cat}${i > 0 ? ` <span class="ml-1 text-xs opacity-70">(${bots.filter(b => b.category === cat).length})</span>` : ''}</button>
+        `).join('')}
+      </div>
+
+      <!-- Bot-Karten Grid -->
+      <div id="bot-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Wird durch JS befüllt -->
+      </div>
+
+      <!-- Keine Ergebnisse -->
+      <div id="no-results" class="hidden text-center py-16">
+        <i class="fas fa-search text-5xl text-slate-200 mb-4 block"></i>
+        <p class="text-slate-500 text-lg">Kein Bot gefunden. Suchbegriff anpassen.</p>
+      </div>
+
+    </section>
+
+    <script>
+      const ALL_BOTS = ${botsJson}
+      let activeCategory = 'Alle'
+      let searchQuery = ''
+
+      function renderBots(bots) {
+        const grid = document.getElementById('bot-grid')
+        const noResults = document.getElementById('no-results')
+        const countEl = document.getElementById('bot-count')
+        countEl.textContent = bots.length
+
+        if (!bots.length) {
+          grid.innerHTML = ''
+          noResults.classList.remove('hidden')
+          return
+        }
+        noResults.classList.add('hidden')
+        grid.innerHTML = bots.map(p => \`
           <div class="card-hover bg-white rounded-2xl shadow-md overflow-hidden border border-slate-100">
             <div class="bg-gradient-to-br from-indigo-500 to-purple-600 p-6 flex justify-between items-start">
               <i class="fas fa-robot text-white text-4xl opacity-80"></i>
               <div class="text-right">
-                ${p.badge ? `<span class="text-xs font-bold px-3 py-1 rounded-full bg-white/20 text-white">${p.badge}</span>` : ''}
-                <div class="text-white/70 text-xs mt-2">${p.pricingType === 'subscription' ? '<i class="fas fa-sync mr-1"></i>Abo' : '<i class="fas fa-infinity mr-1"></i>Einmalig'}</div>
+                \${p.badge ? \`<span class="text-xs font-bold px-3 py-1 rounded-full bg-white/20 text-white">\${p.badge}</span>\` : ''}
+                <div class="text-white/70 text-xs mt-2">\${p.pricingType === 'subscription' ? '<i class="fas fa-sync mr-1"></i>Abo' : '<i class="fas fa-infinity mr-1"></i>Einmalig'}</div>
               </div>
             </div>
             <div class="p-5">
-              <span class="text-xs font-medium px-2 py-1 rounded-full bg-indigo-50 text-indigo-600">${p.category}</span>
-              <h3 class="font-bold text-slate-800 text-xl mt-3 mb-2">${p.name}</h3>
-              <p class="text-slate-500 text-sm mb-4">${p.description}</p>
+              <span class="text-xs font-medium px-2 py-1 rounded-full bg-indigo-50 text-indigo-600">\${p.category}</span>
+              <h3 class="font-bold text-slate-800 text-xl mt-3 mb-1">\${p.name}</h3>
+              <p class="text-slate-500 text-sm mb-3 italic">\${p.shortDesc}</p>
               <ul class="space-y-1 mb-4">
-                ${p.features.slice(0,3).map(f => `<li class="text-sm text-slate-600 flex items-center gap-2"><i class="fas fa-check text-green-500 text-xs"></i>${f}</li>`).join('')}
+                \${p.features.map(f => \`<li class="text-sm text-slate-600 flex items-center gap-2"><i class="fas fa-check text-green-500 text-xs"></i>\${f}</li>\`).join('')}
               </ul>
               <div class="flex items-center justify-between pt-3 border-t border-slate-100">
                 <div>
-                  <span class="text-2xl font-bold text-indigo-600">${formatPrice(p.price, p.currency)}</span>
-                  ${p.pricingType === 'subscription' ? `<span class="text-slate-400 text-sm">/${p.interval === 'month' ? 'Monat' : 'Jahr'}</span>` : '<span class="text-slate-400 text-sm"> einmalig</span>'}
+                  <span class="text-2xl font-bold text-indigo-600">\${p.price}</span>
+                  \${p.pricingType === 'subscription' ? \`<span class="text-slate-400 text-sm">/\${p.interval === 'month' ? 'Monat' : 'Jahr'}</span>\` : '<span class="text-slate-400 text-sm"> einmalig</span>'}
                 </div>
-                <a href="/product/${p.id}" class="btn-primary text-white px-5 py-2.5 rounded-xl text-sm font-semibold">
-                  Jetzt kaufen
+                <a href="/product/\${p.id}" class="btn-primary text-white px-5 py-2.5 rounded-xl text-sm font-semibold">
+                  Kaufen <i class="fas fa-arrow-right ml-1"></i>
                 </a>
               </div>
             </div>
           </div>
-        `).join('')}
-      </div>
-    </section>`
+        \`).join('')
+      }
+
+      function filterBots() {
+        searchQuery = document.getElementById('bot-search').value.toLowerCase()
+        applyFilters()
+      }
+
+      function selectCategory(cat) {
+        activeCategory = cat
+        document.querySelectorAll('.cat-tab').forEach(btn => {
+          const isSel = btn.dataset.cat === cat
+          btn.className = 'cat-tab px-4 py-2 rounded-full text-sm font-medium transition-all ' +
+            (isSel ? 'bg-indigo-600 text-white shadow' : 'bg-white text-slate-600 border border-slate-200 hover:border-indigo-300 hover:text-indigo-600')
+        })
+        applyFilters()
+      }
+
+      function applyFilters() {
+        let result = ALL_BOTS
+        if (activeCategory !== 'Alle') {
+          result = result.filter(b => b.category === activeCategory)
+        }
+        if (searchQuery) {
+          result = result.filter(b =>
+            b.name.toLowerCase().includes(searchQuery) ||
+            b.shortDesc.toLowerCase().includes(searchQuery) ||
+            b.description.toLowerCase().includes(searchQuery) ||
+            b.category.toLowerCase().includes(searchQuery)
+          )
+        }
+        renderBots(result)
+      }
+
+      // Initial rendern
+      renderBots(ALL_BOTS)
+    </script>`
 
   return c.html(layout('KI-Bots', content))
 })
@@ -759,6 +879,298 @@ app.get('/dashboard', (c) => {
     </script>`
 
   return c.html(layout('Mein Bereich', content))
+})
+
+// ─────────────────────────────────────────────────────────
+// IMPRESSUM
+// ─────────────────────────────────────────────────────────
+app.get('/impressum', (c) => {
+  const content = `
+    <div class="max-w-3xl mx-auto px-4 py-16">
+      <h1 class="text-3xl font-extrabold text-slate-800 mb-8">Impressum</h1>
+      <div class="bg-white rounded-2xl shadow-md p-8 space-y-6 text-slate-700">
+        <div>
+          <h2 class="font-bold text-slate-800 text-lg mb-2">Angaben gemäß § 5 TMG</h2>
+          <p>BlueBanana Studios<br>
+          Inhaber: Michael Konradi<br>
+          [Straße und Hausnummer]<br>
+          [PLZ Ort], Deutschland</p>
+        </div>
+        <div>
+          <h2 class="font-bold text-slate-800 text-lg mb-2">Kontakt</h2>
+          <p>E-Mail: <a href="mailto:support@kiprompts.pro" class="text-indigo-600 hover:underline">support@kiprompts.pro</a></p>
+        </div>
+        <div>
+          <h2 class="font-bold text-slate-800 text-lg mb-2">Umsatzsteuer-ID</h2>
+          <p>Umsatzsteuer-Identifikationsnummer gemäß § 27a UStG:<br>
+          [Ihre USt-ID]</p>
+        </div>
+        <div>
+          <h2 class="font-bold text-slate-800 text-lg mb-2">Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h2>
+          <p>Michael Konradi<br>[Adresse wie oben]</p>
+        </div>
+        <div>
+          <h2 class="font-bold text-slate-800 text-lg mb-2">Haftungsausschluss</h2>
+          <p class="text-sm text-slate-600">Die KI-Bots auf dieser Plattform stellen keine Rechts-, Steuer-, Finanz- oder Medizinberatung dar. Für die bereitgestellten Inhalte übernehmen wir keine Gewähr. Bitte konsultieren Sie bei rechtlich relevanten Fragen immer einen zugelassenen Fachmann.</p>
+        </div>
+        <div>
+          <h2 class="font-bold text-slate-800 text-lg mb-2">Streitschlichtung</h2>
+          <p class="text-sm text-slate-600">Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit: <a href="https://ec.europa.eu/consumers/odr" target="_blank" class="text-indigo-600 hover:underline">https://ec.europa.eu/consumers/odr</a>. Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
+        </div>
+      </div>
+    </div>`
+  return c.html(layout('Impressum', content))
+})
+
+// ─────────────────────────────────────────────────────────
+// DATENSCHUTZ
+// ─────────────────────────────────────────────────────────
+app.get('/datenschutz', (c) => {
+  const content = `
+    <div class="max-w-3xl mx-auto px-4 py-16">
+      <h1 class="text-3xl font-extrabold text-slate-800 mb-8">Datenschutzerklärung</h1>
+      <div class="bg-white rounded-2xl shadow-md p-8 space-y-6 text-slate-700 text-sm leading-relaxed">
+        <div>
+          <h2 class="font-bold text-slate-800 text-base mb-2">1. Verantwortlicher</h2>
+          <p>BlueBanana Studios, Michael Konradi, E-Mail: support@kiprompts.pro</p>
+        </div>
+        <div>
+          <h2 class="font-bold text-slate-800 text-base mb-2">2. Erhobene Daten</h2>
+          <p>Wir erheben und verarbeiten folgende Daten:</p>
+          <ul class="list-disc ml-5 mt-2 space-y-1">
+            <li>E-Mail-Adresse (für Zahlungsabwicklung und Lizenzverwaltung)</li>
+            <li>Zahlungsdaten (verarbeitet ausschließlich durch Stripe, Inc.)</li>
+            <li>Chat-Nachrichten (verschlüsselt gespeichert, nur zur Sitzungskontinuität)</li>
+            <li>Lizenzschlüssel und Nutzungsdaten</li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="font-bold text-slate-800 text-base mb-2">3. Zweck der Datenverarbeitung</h2>
+          <p>Ihre Daten werden ausschließlich zur Vertragserfüllung (Lizenzausstellung, Zugriffskontrolle) und zur Zahlungsabwicklung verwendet. Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO.</p>
+        </div>
+        <div>
+          <h2 class="font-bold text-slate-800 text-base mb-2">4. Stripe</h2>
+          <p>Zahlungen werden über Stripe, Inc. (185 Berry Street, Suite 550, San Francisco, CA 94107, USA) abgewickelt. Stripe ist nach EU-US Data Privacy Framework zertifiziert. Datenschutzerklärung: <a href="https://stripe.com/de/privacy" target="_blank" class="text-indigo-600 hover:underline">stripe.com/de/privacy</a></p>
+        </div>
+        <div>
+          <h2 class="font-bold text-slate-800 text-base mb-2">5. OpenAI / KI-Dienste</h2>
+          <p>Chat-Anfragen werden an OpenAI's API übermittelt. Bitte senden Sie keine personenbezogenen Daten in Chat-Nachrichten. OpenAI Datenschutz: <a href="https://openai.com/privacy" target="_blank" class="text-indigo-600 hover:underline">openai.com/privacy</a></p>
+        </div>
+        <div>
+          <h2 class="font-bold text-slate-800 text-base mb-2">6. Speicherdauer</h2>
+          <p>Lizenzdaten werden bis zur Kündigung/Ablauf + 3 Jahre aufbewahrt (steuerrechtliche Pflichten). Chat-Sessions werden nach 30 Tagen automatisch gelöscht.</p>
+        </div>
+        <div>
+          <h2 class="font-bold text-slate-800 text-base mb-2">7. Ihre Rechte</h2>
+          <p>Sie haben das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung (Art. 18) und Datenübertragbarkeit (Art. 20). Kontakt: support@kiprompts.pro</p>
+        </div>
+        <div>
+          <h2 class="font-bold text-slate-800 text-base mb-2">8. Cookies</h2>
+          <p>Wir verwenden keine Tracking-Cookies. Technisch notwendige Sitzungsdaten werden lokal im Browser gespeichert (localStorage).</p>
+        </div>
+      </div>
+    </div>`
+  return c.html(layout('Datenschutz', content))
+})
+
+// ─────────────────────────────────────────────────────────
+// AGB
+// ─────────────────────────────────────────────────────────
+app.get('/agb', (c) => {
+  const content = `
+    <div class="max-w-3xl mx-auto px-4 py-16">
+      <h1 class="text-3xl font-extrabold text-slate-800 mb-8">Allgemeine Geschäftsbedingungen</h1>
+      <div class="bg-white rounded-2xl shadow-md p-8 space-y-6 text-slate-700 text-sm leading-relaxed">
+        <div>
+          <h2 class="font-bold text-slate-800 text-base mb-2">§ 1 Geltungsbereich</h2>
+          <p>Diese AGB gelten für alle Käufe über KIPromptsPro (BlueBanana Studios, Michael Konradi). Verbraucher im Sinne von § 13 BGB sind natürliche Personen, die die Verträge zu Zwecken abschließen, die überwiegend weder ihrer gewerblichen noch selbständigen beruflichen Tätigkeit zugerechnet werden können.</p>
+        </div>
+        <div>
+          <h2 class="font-bold text-slate-800 text-base mb-2">§ 2 Vertragsgegenstand</h2>
+          <p>Gegenstand des Vertrags ist die entgeltliche Überlassung von KI-Chatbot-Systemprompts (Software/digitale Inhalte) sowie digitaler Produkte (eBooks, Whitepapers, Videokurse) als Einmalkauf oder Abonnement.</p>
+        </div>
+        <div>
+          <h2 class="font-bold text-slate-800 text-base mb-2">§ 3 Preise und Zahlung</h2>
+          <p>Alle Preise sind Endpreise inkl. MwSt. Die Zahlung erfolgt über Stripe. Bei Abonnements wird der Betrag monatlich/jährlich automatisch eingezogen. Abonnements können jederzeit zum Ende des Abrechnungszeitraums gekündigt werden.</p>
+        </div>
+        <div>
+          <h2 class="font-bold text-slate-800 text-base mb-2">§ 4 Widerrufsrecht</h2>
+          <p>Sie haben das Recht, diesen Vertrag binnen 14 Tagen ohne Angabe von Gründen zu widerrufen. <strong>Das Widerrufsrecht erlischt vorzeitig</strong>, wenn wir mit der Ausführung des Vertrags begonnen haben und Sie ausdrücklich zugestimmt haben, dass wir mit der Ausführung beginnen, bevor die Widerrufsfrist abgelaufen ist. Beim Kauf erteilen Sie durch Anklicken des Kaufen-Buttons diese ausdrückliche Zustimmung.</p>
+        </div>
+        <div>
+          <h2 class="font-bold text-slate-800 text-base mb-2">§ 5 Lizenz und Nutzungsrechte</h2>
+          <p>Mit dem Kauf erhalten Sie ein nicht-exklusives, nicht übertragbares Nutzungsrecht für den persönlichen oder geschäftlichen Gebrauch. Eine Weitergabe, Weiterveräußerung oder öffentliche Zugänglichmachung der Inhalte ist untersagt.</p>
+        </div>
+        <div>
+          <h2 class="font-bold text-slate-800 text-base mb-2">§ 6 Haftungsbeschränkung</h2>
+          <p>Die KI-generierten Antworten ersetzen keine professionelle Rechts-, Steuer- oder Medizinberatung. Wir haften nicht für Schäden, die durch fehlerhafte KI-Ausgaben entstehen. Die Haftung ist auf Vorsatz und grobe Fahrlässigkeit beschränkt.</p>
+        </div>
+        <div>
+          <h2 class="font-bold text-slate-800 text-base mb-2">§ 7 Anwendbares Recht</h2>
+          <p>Es gilt deutsches Recht. Gerichtsstand ist, soweit gesetzlich zulässig, der Sitz des Anbieters.</p>
+        </div>
+      </div>
+    </div>`
+  return c.html(layout('AGB', content))
+})
+
+// ─────────────────────────────────────────────────────────
+// BOT-CHAT-SEITE  /bot/:botId?key=XXXX-XXXX-XXXX-XXXX
+// Widget wird client-seitig initialisiert nach Lizenzprüfung
+// ─────────────────────────────────────────────────────────
+app.get('/bot/:botId', (c) => {
+  const botId = c.req.param('botId')
+  const licenseKey = c.req.query('key') ?? ''
+
+  const product = getProductById(botId)
+  if (!product || product.type !== 'bot') {
+    return c.html(layout('Nicht gefunden', `
+      <div class="max-w-xl mx-auto py-32 text-center">
+        <i class="fas fa-robot text-6xl text-slate-300 mb-6 block"></i>
+        <h1 class="text-2xl font-bold text-slate-700 mb-4">Bot nicht gefunden</h1>
+        <a href="/bots" class="btn-primary text-white px-6 py-3 rounded-xl font-semibold">Zur Bot-Bibliothek</a>
+      </div>`), 404)
+  }
+
+  // UI-Config für die Seite (kein systemPrompt!)
+  const uiConf = getBotUIConfig(botId)
+
+  const content = `
+    <div class="max-w-4xl mx-auto px-4 py-10">
+      <a href="/bots" class="text-indigo-600 hover:text-indigo-800 text-sm mb-6 inline-flex items-center gap-1">
+        <i class="fas fa-arrow-left"></i> Alle Bots
+      </a>
+
+      <!-- Lizenz-Gate: wird client-seitig geprüft -->
+      <div id="license-gate" class="${licenseKey ? 'hidden' : ''}">
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-10 text-center max-w-md mx-auto">
+          <i class="fas fa-lock text-5xl text-indigo-400 mb-5 block"></i>
+          <h2 class="text-2xl font-bold text-slate-800 mb-3">Lizenzschlüssel erforderlich</h2>
+          <p class="text-slate-500 mb-6">Gib deinen Lizenzschlüssel ein um ${product.name} zu nutzen.</p>
+          <div class="flex gap-2">
+            <input type="text" id="key-input"
+              placeholder="XXXX-XXXX-XXXX-XXXX"
+              class="flex-1 border border-slate-300 rounded-xl px-4 py-3 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <button onclick="activateBot()" class="btn-primary text-white px-5 py-3 rounded-xl font-semibold">
+              <i class="fas fa-unlock mr-1"></i>Öffnen
+            </button>
+          </div>
+          <p id="key-error" class="text-red-500 text-sm mt-3 hidden"></p>
+          <div class="mt-6 pt-6 border-t border-slate-100">
+            <p class="text-slate-500 text-sm">Noch keine Lizenz?</p>
+            <a href="/product/${botId}" class="text-indigo-600 font-semibold hover:underline text-sm">
+              ${product.name} kaufen →
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat-Interface (nach Lizenzprüfung sichtbar) -->
+      <div id="chat-area" class="${licenseKey ? '' : 'hidden'}">
+        <div class="grid md:grid-cols-3 gap-6">
+          <!-- Bot-Info Sidebar -->
+          <div class="md:col-span-1">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-md overflow-hidden sticky top-24">
+              <div class="bg-gradient-to-br ${uiConf?.avatarColor ?? 'from-indigo-500 to-purple-600'} p-6 text-center text-white">
+                <i class="fas ${uiConf?.avatarIcon ?? 'fa-robot'} text-5xl mb-3 block opacity-90"></i>
+                <div class="font-bold text-lg">${product.name}</div>
+                <div class="text-white/70 text-xs mt-1">${product.category}</div>
+              </div>
+              <div class="p-4">
+                <p class="text-slate-600 text-sm mb-4">${product.shortDesc}</p>
+                <div class="space-y-2">
+                  ${product.useCases.slice(0,4).map(uc =>
+                    `<div class="text-xs text-slate-500 flex items-start gap-2">
+                      <i class="fas fa-angle-right text-indigo-400 mt-0.5 flex-shrink-0"></i>${uc}
+                    </div>`
+                  ).join('')}
+                </div>
+                <div class="mt-4 pt-4 border-t border-slate-100 text-xs text-slate-400">
+                  <div class="flex items-center gap-1 mb-1">
+                    <i class="fas fa-microchip text-indigo-300"></i>
+                    Modell: ${uiConf?.model ?? 'GPT-4o'}
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <i class="fas fa-key text-indigo-300"></i>
+                    <span id="key-display">Lizenz wird geprüft...</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat-Widget -->
+          <div class="md:col-span-2" style="height:640px">
+            <div id="chat-widget-container" class="h-full"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/static/chat-widget.js"></script>
+    <script>
+      const PRE_KEY = '${licenseKey}'
+      const BOT_ID = '${botId}'
+      let currentKey = PRE_KEY
+
+      // Wenn Key in URL → direkt verifizieren
+      if (PRE_KEY) { verifyAndInit(PRE_KEY) }
+
+      async function activateBot() {
+        const key = document.getElementById('key-input').value.trim()
+        const errEl = document.getElementById('key-error')
+        if (!key) { errEl.textContent = 'Bitte Schlüssel eingeben'; errEl.classList.remove('hidden'); return }
+        errEl.classList.add('hidden')
+        currentKey = key
+        verifyAndInit(key)
+      }
+
+      async function verifyAndInit(key) {
+        try {
+          const res = await fetch('/api/license/verify?key=' + encodeURIComponent(key))
+          const data = await res.json()
+
+          if (!data.valid) {
+            showKeyError(data.error || 'Ungültige Lizenz')
+            return
+          }
+
+          if (data.license.productId !== BOT_ID) {
+            showKeyError('Diese Lizenz gilt für: ' + data.license.productName)
+            return
+          }
+
+          // Lizenz gültig → Chat initialisieren
+          document.getElementById('license-gate').classList.add('hidden')
+          document.getElementById('chat-area').classList.remove('hidden')
+          document.getElementById('key-display').textContent = key.slice(0,4) + '-****-****-' + key.slice(-4)
+
+          const ui = data.botUI || {}
+          new ChatWidget('chat-widget-container', {
+            botId: BOT_ID,
+            licenseKey: key,
+            botName: '${product.name}',
+            welcomeMessage: ui.welcomeMessage || 'Hallo! Wie kann ich helfen?',
+            placeholder: ui.placeholder || 'Nachricht eingeben...',
+            avatarIcon: ui.avatarIcon || 'fa-robot',
+            avatarColor: ui.avatarColor || 'from-indigo-500 to-purple-600'
+          })
+        } catch {
+          showKeyError('Verbindungsfehler. Bitte versuche es erneut.')
+        }
+      }
+
+      function showKeyError(msg) {
+        const errEl = document.getElementById('key-error')
+        if (errEl) { errEl.textContent = msg; errEl.classList.remove('hidden') }
+        document.getElementById('license-gate').classList.remove('hidden')
+        document.getElementById('chat-area').classList.add('hidden')
+      }
+    </script>`
+
+  return c.html(layout(product.name, content,
+    `<script src="https://cdn.tailwindcss.com"></script>`
+  ))
 })
 
 export default app
