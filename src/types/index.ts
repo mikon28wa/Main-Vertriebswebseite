@@ -4,7 +4,7 @@
 // ============================================================
 
 // ── Produkt-Typen ──────────────────────────────────────────
-export type ProductType = 'bot' | 'ebook' | 'whitepaper' | 'video' | 'bundle' | 'saas'
+export type ProductType = 'bot' | 'ebook' | 'whitepaper' | 'video' | 'bundle' | 'saas' | 'analyse'
 export type PricingType = 'one_time' | 'subscription'
 export type SubscriptionInterval = 'month' | 'year'
 
@@ -21,7 +21,37 @@ export type BotCategory =
   | 'Sprache & Übersetzung'
   | 'Bildung'
   | 'KI-Tools'
+  | 'Analysen'
   | 'Sonstiges'
+
+// ── Analyse-Eintrag (eigenständiger Typ, kein Bot) ────────
+export type AnalyseCategory =
+  | 'Marktanalyse'
+  | 'Technologie'
+  | 'Recht & Compliance'
+  | 'Finanzanalyse'
+  | 'KI & Automatisierung'
+  | 'Business & Strategie'
+  | 'Gesellschaft & Trends'
+  | 'Sonstiges'
+
+export interface AnalyseEntry {
+  id: string
+  title: string                // Themenüberschrift
+  shortDesc: string            // Kurzbeschreibung Scope
+  fullDesc: string             // Ausführliche Beschreibung (Preview hinter Paywall)
+  category: AnalyseCategory
+  lastUpdated: string          // ISO-Datum  z.B. '2025-01-15'
+  pageCount?: number           // Umfang in Seiten
+  price: number                // in Cent
+  currency: string
+  stripePriceId: string
+  stripeProductId: string
+  badge?: string
+  active: boolean
+  contentHtml: string          // Vollständiger HTML-Inhalt (nur nach Kauf sichtbar)
+  previewHtml?: string         // Öffentlicher Teaser
+}
 
 export type AIProvider = 'openai' | 'anthropic' | 'mistral'
 

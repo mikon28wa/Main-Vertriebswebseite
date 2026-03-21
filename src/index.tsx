@@ -12,9 +12,17 @@ import chatRoute    from './routes/api-chat'
 import checkoutRoute from './routes/api-checkout'
 import licenseRoute  from './routes/api-license'
 import webhookRoute  from './routes/api-webhook'
+import analyseRoute  from './routes/api-analyse'
 
 import { PRODUCTS, getProductById, formatPrice } from './lib/products'
 import { getBotUIConfig, getAllBotIds } from './lib/bot-registry'
+import {
+  ANALYSES,
+  getAnalyseById,
+  getActiveAnalyses,
+  getAllAnalyseCategories,
+  formatAnalyseDate
+} from './lib/analyse-registry'
 
 const app = new Hono<{ Bindings: Bindings }>()
 
@@ -28,6 +36,7 @@ app.route('/api/chat',     chatRoute)
 app.route('/api/checkout', checkoutRoute)
 app.route('/api/license',  licenseRoute)
 app.route('/api/webhook',  webhookRoute)
+app.route('/api/analyse',  analyseRoute)
 
 // ─────────────────────────────────────────────────────────
 // Shared Layout
@@ -66,6 +75,9 @@ function layout(title: string, content: string, extraHead = ''): string {
         <a href="/#products" class="hover:text-indigo-300 transition-colors">Produkte</a>
         <a href="/bots" class="hover:text-indigo-300 transition-colors">KI-Bots</a>
         <a href="/digital" class="hover:text-indigo-300 transition-colors">eBooks & Kurse</a>
+        <a href="/analysen" class="hover:text-amber-300 transition-colors flex items-center gap-1">
+          <i class="fas fa-chart-line text-amber-400 text-xs"></i>Analysen
+        </a>
         <a href="/dashboard" class="hover:text-indigo-300 transition-colors">Mein Bereich</a>
       </div>
       <div class="flex items-center gap-3">
@@ -95,6 +107,7 @@ function layout(title: string, content: string, extraHead = ''): string {
           <li><a href="/bots" class="hover:text-indigo-400 transition-colors">KI-Bots</a></li>
           <li><a href="/digital" class="hover:text-indigo-400 transition-colors">eBooks</a></li>
           <li><a href="/digital" class="hover:text-indigo-400 transition-colors">Kurse</a></li>
+          <li><a href="/analysen" class="hover:text-amber-400 transition-colors">Analysen</a></li>
         </ul>
       </div>
       <div>
@@ -195,12 +208,13 @@ app.get('/', (c) => {
       <div class="max-w-7xl mx-auto">
         <h2 class="text-3xl font-bold text-center text-slate-800 mb-4">Was wir anbieten</h2>
         <p class="text-center text-slate-500 mb-12">Alles was Sie für KI-gestütztes Business brauchen</p>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-6">
           ${[
             { icon: 'fa-robot', label: 'KI-Bots', desc: '90 Systemprompts', color: 'bg-indigo-50 text-indigo-600', href: '/bots' },
             { icon: 'fa-book-open', label: 'eBooks & Guides', desc: 'Sofort-Download', color: 'bg-emerald-50 text-emerald-600', href: '/digital' },
             { icon: 'fa-play-circle', label: 'Videokurse', desc: 'HD-Schulungen', color: 'bg-rose-50 text-rose-600', href: '/digital' },
             { icon: 'fa-file-alt', label: 'Whitepapers', desc: 'B2B-Studien', color: 'bg-amber-50 text-amber-600', href: '/digital' },
+            { icon: 'fa-chart-line', label: 'Analysen', desc: 'Exklusive Studien', color: 'bg-yellow-50 text-yellow-600', href: '/analysen' },
           ].map(item => `
             <a href="${item.href}" class="card-hover ${item.color} rounded-2xl p-6 text-center">
               <i class="fas ${item.icon} text-4xl mb-3"></i>
@@ -1171,6 +1185,540 @@ app.get('/bot/:botId', (c) => {
   return c.html(layout(product.name, content,
     `<script src="https://cdn.tailwindcss.com"></script>`
   ))
+})
+
+// ─────────────────────────────────────────────────────────
+// ANALYSEN ÜBERSICHT
+// ─────────────────────────────────────────────────────────
+app.get('/analysen', (c) => {
+  const analyses = getActiveAnalyses()
+  const categories = ['Alle', ...getAllAnalyseCategories()]
+
+  const analysesJson = JSON.stringify(analyses.map(a => ({
+    id: a.id,
+    title: a.title,
+    shortDesc: a.shortDesc,
+    category: a.category,
+    lastUpdated: a.lastUpdated,
+    lastUpdatedFormatted: formatAnalyseDate(a.lastUpdated),
+    pageCount: a.pageCount ?? null,
+    price: formatPrice(a.price, a.currency),
+    badge: a.badge ?? ''
+  })))
+
+  const catColors: Record<string, string> = {
+    'KI & Automatisierung': 'bg-purple-100 text-purple-700',
+    'Marktanalyse': 'bg-blue-100 text-blue-700',
+    'Recht & Compliance': 'bg-red-100 text-red-700',
+    'Finanzanalyse': 'bg-green-100 text-green-700',
+    'Business & Strategie': 'bg-orange-100 text-orange-700',
+    'Gesellschaft & Trends': 'bg-teal-100 text-teal-700',
+    'Technologie': 'bg-indigo-100 text-indigo-700',
+    'Sonstiges': 'bg-slate-100 text-slate-600'
+  }
+  const catColorsJson = JSON.stringify(catColors)
+
+  const content = `
+    <section class="bg-gradient-to-br from-slate-900 via-amber-950 to-slate-900 text-white py-16 px-4">
+      <div class="max-w-5xl mx-auto text-center">
+        <div class="inline-flex items-center gap-2 bg-amber-600/30 border border-amber-500/40 px-4 py-2 rounded-full text-sm mb-6">
+          <i class="fas fa-lock text-amber-300"></i>
+          <span>Exklusive Paywall-Analysen</span>
+        </div>
+        <i class="fas fa-chart-line text-5xl text-amber-400 mb-4 block"></i>
+        <h1 class="text-4xl font-extrabold mb-4">KI-Analysen &amp; Studien</h1>
+        <p class="text-slate-300 text-lg max-w-2xl mx-auto">
+          Fundierte Analysen zu KI-Trends, Marktentwicklungen und Compliance-Anforderungen.
+          Einmaliger Kauf – dauerhafter Zugang zu Ihrem persönlichen Lizenzschlüssel.
+        </p>
+        <p class="text-amber-300 font-semibold mt-3">${analyses.length} Analysen verfügbar</p>
+      </div>
+    </section>
+
+    <section class="py-10 px-4 max-w-7xl mx-auto">
+
+      <!-- Kategorie-Tabs -->
+      <div class="flex flex-wrap gap-2 mb-8" id="cat-tabs">
+        ${categories.map((cat, i) => `
+          <button
+            onclick="selectCat('${cat}')"
+            data-cat="${cat}"
+            class="atab px-4 py-2 rounded-full text-sm font-medium transition-all ${i === 0 ? 'bg-amber-600 text-white shadow' : 'bg-white text-slate-600 border border-slate-200 hover:border-amber-300 hover:text-amber-700'}"
+          >${cat}${i > 0 ? ` <span class="ml-1 text-xs opacity-70">(${analyses.filter(a => a.category === cat).length})</span>` : ''}</button>
+        `).join('')}
+      </div>
+
+      <!-- Analysen-Grid -->
+      <div id="analyse-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+
+      <!-- Keine Ergebnisse -->
+      <div id="no-analyse" class="hidden text-center py-16">
+        <i class="fas fa-chart-bar text-5xl text-slate-200 mb-4 block"></i>
+        <p class="text-slate-500 text-lg">Keine Analysen in dieser Kategorie.</p>
+      </div>
+
+      <!-- Info-Box Paywall -->
+      <div class="mt-16 bg-amber-50 border border-amber-200 rounded-2xl p-8 text-center">
+        <i class="fas fa-lock text-3xl text-amber-500 mb-4 block"></i>
+        <h3 class="font-bold text-slate-800 text-xl mb-2">So funktioniert der Zugang</h3>
+        <div class="grid md:grid-cols-3 gap-6 mt-6 text-sm text-slate-600">
+          <div class="flex flex-col items-center gap-2">
+            <div class="w-10 h-10 bg-amber-600 text-white rounded-full flex items-center justify-center font-bold">1</div>
+            <strong>Analyse wählen</strong>
+            <p>Wählen Sie eine Analyse aus und klicken Sie auf "Kaufen".</p>
+          </div>
+          <div class="flex flex-col items-center gap-2">
+            <div class="w-10 h-10 bg-amber-600 text-white rounded-full flex items-center justify-center font-bold">2</div>
+            <strong>Sicher bezahlen</strong>
+            <p>Einmalzahlung via Stripe. Kreditkarte, SEPA und mehr.</p>
+          </div>
+          <div class="flex flex-col items-center gap-2">
+            <div class="w-10 h-10 bg-amber-600 text-white rounded-full flex items-center justify-center font-bold">3</div>
+            <strong>Lizenzschlüssel erhalten</strong>
+            <p>Ihr Schlüssel erscheint sofort. Damit lesen Sie die Analyse jederzeit.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      const ALL_ANALYSES = ${analysesJson}
+      const CAT_COLORS = ${catColorsJson}
+      let activeCat = 'Alle'
+
+      function renderAnalyses(list) {
+        const grid = document.getElementById('analyse-grid')
+        const noEl = document.getElementById('no-analyse')
+        if (!list.length) {
+          grid.innerHTML = ''
+          noEl.classList.remove('hidden')
+          return
+        }
+        noEl.classList.add('hidden')
+        grid.innerHTML = list.map(a => {
+          const catCls = CAT_COLORS[a.category] || 'bg-slate-100 text-slate-600'
+          return \`
+          <div class="card-hover bg-white rounded-2xl shadow-md overflow-hidden border border-slate-100">
+            <div class="bg-gradient-to-br from-amber-500 to-orange-600 p-6 flex justify-between items-start">
+              <i class="fas fa-chart-line text-white text-4xl opacity-80"></i>
+              <div class="text-right">
+                \${a.badge ? \`<span class="text-xs font-bold px-3 py-1 rounded-full bg-white/20 text-white">\${a.badge}</span>\` : ''}
+                <div class="text-white/70 text-xs mt-2"><i class="fas fa-lock mr-1"></i>Paywall</div>
+              </div>
+            </div>
+            <div class="p-5">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-xs font-medium px-2 py-1 rounded-full \${catCls}">\${a.category}</span>
+                \${a.pageCount ? \`<span class="text-xs text-slate-400"><i class="fas fa-file-alt mr-1"></i>\${a.pageCount} Seiten</span>\` : ''}
+              </div>
+              <h3 class="font-bold text-slate-800 text-lg mt-2 mb-2 leading-tight">\${a.title}</h3>
+              <p class="text-slate-500 text-sm mb-3 line-clamp-3">\${a.shortDesc}</p>
+              <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+                <div>
+                  <span class="text-xl font-bold text-amber-600">\${a.price}</span>
+                  <span class="text-slate-400 text-xs ml-1">einmalig</span>
+                  <div class="text-slate-400 text-xs mt-0.5">
+                    <i class="fas fa-calendar-alt mr-1"></i>Aktualisiert: \${a.lastUpdatedFormatted}
+                  </div>
+                </div>
+                <a href="/analyse/\${a.id}" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all">
+                  Details <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+              </div>
+            </div>
+          </div>\`
+        }).join('')
+      }
+
+      function selectCat(cat) {
+        activeCat = cat
+        document.querySelectorAll('.atab').forEach(btn => {
+          const sel = btn.dataset.cat === cat
+          btn.className = 'atab px-4 py-2 rounded-full text-sm font-medium transition-all ' +
+            (sel ? 'bg-amber-600 text-white shadow' : 'bg-white text-slate-600 border border-slate-200 hover:border-amber-300 hover:text-amber-700')
+        })
+        const filtered = cat === 'Alle' ? ALL_ANALYSES : ALL_ANALYSES.filter(a => a.category === cat)
+        renderAnalyses(filtered)
+      }
+
+      renderAnalyses(ALL_ANALYSES)
+    </script>`
+
+  return c.html(layout('Analysen & Studien', content))
+})
+
+// ─────────────────────────────────────────────────────────
+// ANALYSE EINZELSEITE (mit Paywall)
+// ─────────────────────────────────────────────────────────
+app.get('/analyse/:id', (c) => {
+  const id = c.req.param('id')
+  const analyse = getAnalyseById(id)
+
+  if (!analyse) {
+    return c.html(layout('Nicht gefunden', `
+      <div class="max-w-xl mx-auto py-32 text-center">
+        <i class="fas fa-search text-6xl text-slate-300 mb-6 block"></i>
+        <h1 class="text-2xl font-bold text-slate-700 mb-4">Analyse nicht gefunden</h1>
+        <a href="/analysen" class="btn-primary text-white px-6 py-3 rounded-xl font-semibold">Alle Analysen</a>
+      </div>`), 404)
+  }
+
+  const catColors: Record<string, string> = {
+    'KI & Automatisierung': 'bg-purple-100 text-purple-700',
+    'Marktanalyse': 'bg-blue-100 text-blue-700',
+    'Recht & Compliance': 'bg-red-100 text-red-700',
+    'Finanzanalyse': 'bg-green-100 text-green-700',
+    'Business & Strategie': 'bg-orange-100 text-orange-700',
+    'Gesellschaft & Trends': 'bg-teal-100 text-teal-700',
+    'Technologie': 'bg-indigo-100 text-indigo-700',
+    'Sonstiges': 'bg-slate-100 text-slate-600'
+  }
+  const catCls = catColors[analyse.category] || 'bg-slate-100 text-slate-600'
+
+  const content = `
+    <div class="max-w-5xl mx-auto px-4 py-12">
+      <a href="/analysen" class="text-amber-600 hover:text-amber-800 text-sm mb-6 inline-flex items-center gap-1">
+        <i class="fas fa-arrow-left"></i> Alle Analysen
+      </a>
+
+      <div class="grid md:grid-cols-5 gap-10">
+        <!-- LEFT: Analyse-Info -->
+        <div class="md:col-span-3">
+          <!-- Header-Card -->
+          <div class="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-10 text-white mb-6">
+            <div class="flex items-start justify-between mb-4">
+              <i class="fas fa-chart-line text-6xl opacity-80"></i>
+              <div class="text-right">
+                ${analyse.badge ? `<span class="bg-white/20 px-3 py-1 rounded-full text-sm font-bold">${analyse.badge}</span>` : ''}
+                <div class="text-white/70 text-xs mt-2"><i class="fas fa-lock mr-1"></i>Paywall-Inhalt</div>
+              </div>
+            </div>
+            <span class="${catCls} text-xs font-medium px-2 py-1 rounded-full bg-white/20 text-white">${analyse.category}</span>
+            <h1 class="text-2xl font-extrabold mt-3 leading-tight">${analyse.title}</h1>
+            <div class="flex items-center gap-4 mt-4 text-white/80 text-sm">
+              <span><i class="fas fa-calendar-alt mr-1"></i>Aktualisiert: ${formatAnalyseDate(analyse.lastUpdated)}</span>
+              ${analyse.pageCount ? `<span><i class="fas fa-file-alt mr-1"></i>${analyse.pageCount} Seiten</span>` : ''}
+            </div>
+          </div>
+
+          <!-- Scope / Beschreibung -->
+          <div class="bg-white rounded-2xl shadow-md p-6 mb-6">
+            <h2 class="font-bold text-slate-800 text-lg mb-3"><i class="fas fa-info-circle text-amber-500 mr-2"></i>Über diese Analyse</h2>
+            <p class="text-slate-600">${analyse.fullDesc}</p>
+          </div>
+
+          <!-- Preview (öffentlicher Teaser) -->
+          ${analyse.previewHtml ? `
+          <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 mb-6">
+            <div class="flex items-center gap-2 mb-3">
+              <i class="fas fa-eye text-amber-500"></i>
+              <span class="font-semibold text-amber-800">Vorschau (kostenloser Auszug)</span>
+            </div>
+            <div class="text-slate-700 prose prose-sm max-w-none">
+              ${analyse.previewHtml}
+            </div>
+            <div class="mt-4 pt-4 border-t border-amber-200 flex items-center gap-2 text-amber-700 text-sm">
+              <i class="fas fa-lock"></i>
+              <span>Der vollständige Inhalt ist nach dem Kauf verfügbar.</span>
+            </div>
+          </div>` : ''}
+
+          <!-- Paywall-Content-Bereich -->
+          <div id="paywall-gate" class="bg-slate-900 rounded-2xl p-8 text-center text-white">
+            <i class="fas fa-lock text-5xl text-amber-400 mb-4 block"></i>
+            <h3 class="text-xl font-bold mb-2">Vollständiger Inhalt gesperrt</h3>
+            <p class="text-slate-300 mb-6">Kaufen Sie diese Analyse einmalig für dauerhaften Zugriff.</p>
+            <p class="text-amber-300 font-bold text-2xl mb-6">${formatPrice(analyse.price, analyse.currency)} <span class="text-sm font-normal text-slate-400">einmalig</span></p>
+
+            <!-- Lizenzschlüssel eingeben -->
+            <div class="mt-6 border-t border-slate-700 pt-6">
+              <p class="text-slate-400 text-sm mb-3">Bereits gekauft? Lizenzschlüssel eingeben:</p>
+              <div class="flex gap-2 max-w-sm mx-auto">
+                <input
+                  type="text"
+                  id="licence-input"
+                  placeholder="XXXX-XXXX-XXXX-XXXX"
+                  class="flex-1 bg-slate-800 border border-slate-600 text-white rounded-xl px-4 py-2 text-sm uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-amber-500"
+                >
+                <button onclick="checkLicence()" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-colors">
+                  <i class="fas fa-unlock"></i>
+                </button>
+              </div>
+              <div id="licence-error" class="hidden mt-2 text-red-400 text-xs text-center"></div>
+              <div id="licence-loading" class="hidden mt-2 text-amber-300 text-xs text-center">
+                <i class="fas fa-spinner fa-spin mr-1"></i>Prüfe Lizenz...
+              </div>
+            </div>
+          </div>
+
+          <!-- Vollständiger Inhalt (nach Unlock) -->
+          <div id="analyse-content" class="hidden bg-white rounded-2xl shadow-md p-8">
+            <div class="flex items-center gap-2 mb-6 pb-4 border-b border-slate-200">
+              <i class="fas fa-unlock text-green-500"></i>
+              <span class="text-green-600 font-semibold text-sm">Zugang gewährt – vollständige Analyse</span>
+            </div>
+            <div id="analyse-inner" class="prose prose-slate max-w-none analyse-text"></div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Checkout Box -->
+        <div class="md:col-span-2">
+          <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-8 sticky top-24">
+            <div class="text-center mb-6">
+              <div class="text-4xl font-extrabold text-amber-600">${formatPrice(analyse.price, analyse.currency)}</div>
+              <div class="text-slate-500 mt-1 text-sm">einmalige Zahlung – dauerhafter Zugriff</div>
+            </div>
+
+            <!-- Was ist enthalten -->
+            <div class="bg-amber-50 rounded-xl p-4 mb-5">
+              <div class="text-sm font-semibold text-amber-800 mb-2">Was Sie erhalten:</div>
+              <ul class="space-y-1 text-sm text-slate-700">
+                <li class="flex items-center gap-2"><i class="fas fa-check text-green-500 text-xs"></i>Vollständige Analyse (${analyse.pageCount ?? '~'} Seiten)</li>
+                <li class="flex items-center gap-2"><i class="fas fa-check text-green-500 text-xs"></i>Lizenzschlüssel für dauerhaften Zugriff</li>
+                <li class="flex items-center gap-2"><i class="fas fa-check text-green-500 text-xs"></i>Aktualisiert: ${formatAnalyseDate(analyse.lastUpdated)}</li>
+                <li class="flex items-center gap-2"><i class="fas fa-check text-green-500 text-xs"></i>Sofortiger Online-Zugang</li>
+              </ul>
+            </div>
+
+            <!-- Checkout Form -->
+            <form id="analyse-checkout-form" class="space-y-4">
+              <input type="hidden" id="analyse-id" value="${analyse.id}">
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">
+                  <i class="fas fa-envelope mr-1 text-amber-500"></i>E-Mail-Adresse
+                </label>
+                <input
+                  type="email"
+                  id="analyse-email"
+                  placeholder="ihre@email.de"
+                  required
+                  class="w-full border border-slate-300 rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                >
+              </div>
+
+              <button
+                type="submit"
+                id="analyse-checkout-btn"
+                class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg transition-all"
+              >
+                <i class="fas fa-lock mr-2"></i>Jetzt kaufen
+              </button>
+
+              <div id="analyse-error" class="hidden text-red-600 text-sm text-center bg-red-50 rounded-lg p-3"></div>
+            </form>
+
+            <!-- Trust Signals -->
+            <div class="mt-6 space-y-2 text-xs text-slate-500">
+              <div class="flex items-center gap-2"><i class="fab fa-stripe text-indigo-500 text-lg"></i>Sichere Zahlung via Stripe</div>
+              <div class="flex items-center gap-2"><i class="fas fa-shield-alt text-green-500"></i>SSL-verschlüsselt & DSGVO-konform</div>
+              <div class="flex items-center gap-2"><i class="fas fa-bolt text-yellow-500"></i>Sofortiger Zugriff nach Zahlung</div>
+              <div class="flex items-center gap-2"><i class="fas fa-undo text-blue-500"></i>14 Tage Rückgaberecht</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      .analyse-text h1 { font-size: 1.75rem; font-weight: 800; color: #1e293b; margin: 1.5rem 0 0.75rem; }
+      .analyse-text h2 { font-size: 1.35rem; font-weight: 700; color: #1e293b; margin: 1.5rem 0 0.5rem; border-bottom: 2px solid #fbbf24; padding-bottom: 0.25rem; }
+      .analyse-text h3 { font-size: 1.1rem; font-weight: 600; color: #334155; margin: 1rem 0 0.4rem; }
+      .analyse-text p { color: #475569; line-height: 1.7; margin-bottom: 0.75rem; }
+      .analyse-text ul, .analyse-text ol { padding-left: 1.5rem; margin-bottom: 0.75rem; }
+      .analyse-text li { color: #475569; margin-bottom: 0.35rem; }
+      .analyse-text table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.875rem; }
+      .analyse-text th { background: #fef3c7; color: #92400e; padding: 0.5rem 0.75rem; text-align: left; font-weight: 600; }
+      .analyse-text td { padding: 0.5rem 0.75rem; border-bottom: 1px solid #e2e8f0; color: #475569; }
+      .analyse-text tr:nth-child(even) td { background: #f8fafc; }
+      .analyse-text pre { background: #0f172a; color: #e2e8f0; padding: 1rem; border-radius: 0.75rem; overflow-x: auto; margin: 1rem 0; font-size: 0.8rem; }
+      .analyse-text code { font-family: monospace; font-size: 0.875rem; }
+      .analyse-text strong { color: #1e293b; font-weight: 700; }
+    </style>
+
+    <script>
+      const ANALYSE_ID = '${analyse.id}'
+
+      // Checkout
+      document.getElementById('analyse-checkout-form').addEventListener('submit', async (e) => {
+        e.preventDefault()
+        const btn = document.getElementById('analyse-checkout-btn')
+        const errDiv = document.getElementById('analyse-error')
+        const email = document.getElementById('analyse-email').value.trim()
+
+        if (!email) { errDiv.textContent = 'Bitte E-Mail eingeben'; errDiv.classList.remove('hidden'); return }
+
+        btn.disabled = true
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Weiterleitung...'
+        errDiv.classList.add('hidden')
+
+        try {
+          const res = await axios.post('/api/analyse/checkout', { analyseId: ANALYSE_ID, email })
+          if (res.data.url) {
+            window.location.href = res.data.url
+          } else {
+            throw new Error('Keine Checkout-URL erhalten')
+          }
+        } catch (err) {
+          const msg = err.response?.data?.error || err.message || 'Fehler beim Checkout'
+          errDiv.textContent = msg
+          errDiv.classList.remove('hidden')
+          btn.disabled = false
+          btn.innerHTML = '<i class="fas fa-lock mr-2"></i>Jetzt kaufen'
+        }
+      })
+
+      // Lizenz prüfen
+      async function checkLicence() {
+        const key = document.getElementById('licence-input').value.trim().toUpperCase()
+        const errEl = document.getElementById('licence-error')
+        const loadEl = document.getElementById('licence-loading')
+
+        if (!key || key.length < 10) {
+          errEl.textContent = 'Bitte gültigen Lizenzschlüssel eingeben (Format: XXXX-XXXX-XXXX-XXXX)'
+          errEl.classList.remove('hidden')
+          return
+        }
+
+        errEl.classList.add('hidden')
+        loadEl.classList.remove('hidden')
+
+        try {
+          const res = await axios.get('/api/analyse/access', {
+            params: { analyseId: ANALYSE_ID, licenseKey: key }
+          })
+          loadEl.classList.add('hidden')
+
+          if (res.data.hasAccess) {
+            // Paywall ausblenden, Inhalt einblenden
+            document.getElementById('paywall-gate').classList.add('hidden')
+            const contentEl = document.getElementById('analyse-content')
+            contentEl.classList.remove('hidden')
+            document.getElementById('analyse-inner').innerHTML = res.data.contentHtml
+            // Lizenz im sessionStorage merken
+            sessionStorage.setItem('analyse_key_' + ANALYSE_ID, key)
+            window.scrollTo({ top: document.getElementById('analyse-content').offsetTop - 100, behavior: 'smooth' })
+          } else {
+            errEl.textContent = res.data.error || 'Lizenz ungültig oder nicht für diese Analyse gültig.'
+            errEl.classList.remove('hidden')
+          }
+        } catch (err) {
+          loadEl.classList.add('hidden')
+          errEl.textContent = 'Verbindungsfehler. Bitte versuche es erneut.'
+          errEl.classList.remove('hidden')
+        }
+      }
+
+      // Enter-Taste bei Lizenz-Input
+      document.getElementById('licence-input').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') checkLicence()
+        // Automatisch Bindestriche einfügen
+        const v = e.target.value.replace(/-/g, '').toUpperCase()
+        if (v.length > 0 && e.key !== 'Backspace' && e.key !== 'Delete') {
+          e.target.value = v.match(/.{1,4}/g)?.join('-') ?? v
+        }
+      })
+
+      // Gespeicherten Schlüssel aus sessionStorage wiederherstellen
+      const savedKey = sessionStorage.getItem('analyse_key_' + ANALYSE_ID)
+      if (savedKey) {
+        document.getElementById('licence-input').value = savedKey
+        checkLicence()
+      }
+    </script>`
+
+  return c.html(layout(analyse.title, content))
+})
+
+// ─────────────────────────────────────────────────────────
+// ANALYSEN SUCCESS PAGE (nach Stripe-Zahlung)
+// ─────────────────────────────────────────────────────────
+app.get('/analyse-success', async (c) => {
+  const sessionId = c.req.query('session_id')
+
+  const content = `
+    <div class="max-w-2xl mx-auto px-4 py-24 text-center" id="analyse-success-container">
+      <div class="bg-white rounded-3xl shadow-xl p-12" id="als-loading">
+        <i class="fas fa-spinner fa-spin text-5xl text-amber-500 mb-6 block"></i>
+        <h1 class="text-2xl font-bold text-slate-700">Zahlung wird bestätigt...</h1>
+      </div>
+      <div class="bg-white rounded-3xl shadow-xl p-12 hidden" id="als-success">
+        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <i class="fas fa-check text-green-600 text-3xl"></i>
+        </div>
+        <h1 class="text-3xl font-extrabold text-slate-800 mb-3">Analyse freigeschaltet!</h1>
+        <p class="text-slate-500 mb-8">Dein Lizenzschlüssel wurde generiert. Damit kannst du die Analyse jederzeit lesen.</p>
+
+        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 mb-6">
+          <div class="text-amber-700 font-semibold text-sm mb-2"><i class="fas fa-key mr-1"></i>Dein Lizenzschlüssel</div>
+          <div id="als-key" class="font-mono text-2xl font-bold text-amber-900 tracking-wider"></div>
+          <button onclick="copyAlsKey()" class="mt-3 text-xs text-amber-700 hover:text-amber-900 underline">
+            <i class="fas fa-copy mr-1"></i>Kopieren
+          </button>
+        </div>
+
+        <div id="als-analyse-link" class="mb-6"></div>
+
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-700">
+          <i class="fas fa-info-circle mr-2"></i>
+          Bewahre diesen Schlüssel sicher auf. Du benötigst ihn, um die Analyse auf der Analyse-Seite zu lesen.
+        </div>
+      </div>
+      <div class="bg-white rounded-3xl shadow-xl p-12 hidden" id="als-error">
+        <i class="fas fa-exclamation-circle text-5xl text-red-400 mb-6 block"></i>
+        <h1 class="text-2xl font-bold text-slate-700 mb-4">Fehler aufgetreten</h1>
+        <p id="als-error-msg" class="text-slate-500 mb-6"></p>
+        <a href="/analysen" class="btn-primary text-white px-6 py-3 rounded-xl font-semibold">Zu den Analysen</a>
+      </div>
+    </div>
+
+    <script>
+      const SESSION_ID = '${sessionId ?? ''}'
+
+      async function confirmAnalyse() {
+        if (!SESSION_ID) {
+          showAlsError('Keine Session-ID vorhanden.')
+          return
+        }
+        try {
+          const res = await axios.get('/api/analyse/success?session_id=' + SESSION_ID)
+          if (res.data.license) {
+            document.getElementById('als-loading').classList.add('hidden')
+            document.getElementById('als-success').classList.remove('hidden')
+            document.getElementById('als-key').textContent = res.data.license.key
+
+            // Link zur Analyse
+            const pid = res.data.license.productId
+            document.getElementById('als-analyse-link').innerHTML =
+              \`<a href="/analyse/\${pid}" class="inline-block bg-amber-600 hover:bg-amber-500 text-white px-6 py-3 rounded-xl font-semibold transition-colors">
+                <i class="fas fa-chart-line mr-2"></i>Analyse jetzt lesen
+              </a>\`
+          } else {
+            showAlsError(res.data.error || 'Unbekannter Fehler')
+          }
+        } catch (err) {
+          showAlsError(err.response?.data?.error || 'Verbindungsfehler.')
+        }
+      }
+
+      function showAlsError(msg) {
+        document.getElementById('als-loading').classList.add('hidden')
+        document.getElementById('als-error').classList.remove('hidden')
+        document.getElementById('als-error-msg').textContent = msg
+      }
+
+      function copyAlsKey() {
+        const key = document.getElementById('als-key').textContent
+        navigator.clipboard.writeText(key).then(() => {
+          const btn = event.target
+          btn.textContent = 'Kopiert!'
+          setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy mr-1"></i>Kopieren' }, 2000)
+        })
+      }
+
+      confirmAnalyse()
+    </script>`
+
+  return c.html(layout('Analyse freigeschaltet', content))
 })
 
 export default app
