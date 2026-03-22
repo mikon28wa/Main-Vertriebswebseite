@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wireframe-Dokumentation – KIPromptsPro · Meilenstein 1</title>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      line-height: 1.6;
+    }
+
+    /* ── Farben ── */
+    :root {
+      --primary:   #6366f1;
+      --primary-d: #4f46e5;
+      --amber:     #f59e0b;
+      --green:     #10b981;
+      --red:       #ef4444;
+      --slate-50:  #f8fafc;
+      --slate-100: #f1f5f9;
+      --slate-200: #e2e8f0;
+      --slate-300: #cbd5e1;
+      --slate-400: #94a3b8;
+      --slate-600: #475569;
+      --slate-700: #334155;
+      --slate-800: #1e293b;
+      --slate-900: #0f172a;
+      --wire-bg:   #f0f4ff;
+      --wire-box:  #c7d2fe;
+      --wire-dark: #818cf8;
+      --wire-line: #a5b4fc;
+      --wire-text: #3730a3;
+    }
+
+    /* ── Cover ── */
+    .cover {
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+      color: white;
+      padding: 80px 40px;
+      text-align: center;
+      page-break-after: always;
+    }
+    .cover-badge {
+      display: inline-block;
+      background: rgba(99,102,241,0.25);
+      border: 1px solid rgba(99,102,241,0.5);
+      padding: 6px 20px;
+      border-radius: 999px;
+      font-size: 13px;
+      color: #a5b4fc;
+      margin-bottom: 24px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .cover h1 { font-size: 48px; font-weight: 900; margin-bottom: 16px; }
+    .cover h1 span { color: #818cf8; }
+    .cover p { font-size: 18px; color: #94a3b8; max-width: 600px; margin: 0 auto 48px; }
+    .cover-meta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .cover-meta-item {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 20px;
+    }
+    .cover-meta-item .label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+    .cover-meta-item .value { font-size: 15px; font-weight: 600; color: #e2e8f0; }
+
+    /* ── Layout ── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 48px 32px; }
+
+    /* ── Inhaltsverzeichnis ── */
+    .toc {
+      background: white;
+      border: 1px solid var(--slate-200);
+      border-radius: 20px;
+      padding: 40px;
+      margin-bottom: 48px;
+    }
+    .toc h2 { font-size: 22px; font-weight: 800; color: var(--slate-800); margin-bottom: 24px; border-bottom: 3px solid var(--primary); padding-bottom: 12px; }
+    .toc-list { list-style: none; }
+    .toc-list > li { margin-bottom: 8px; }
+    .toc-list a { text-decoration: none; color: var(--primary); font-weight: 500; display: flex; align-items: center; gap-8px; gap: 8px; }
+    .toc-list a:hover { color: var(--primary-d); }
+    .toc-num { display: inline-block; width: 28px; height: 28px; background: var(--primary); color: white; border-radius: 50%; text-align: center; line-height: 28px; font-size: 12px; font-weight: 700; margin-right: 10px; flex-shrink: 0; }
+    .toc-sub { list-style: none; padding-left: 38px; margin-top: 6px; }
+    .toc-sub li { margin-bottom: 4px; }
+    .toc-sub a { font-size: 14px; color: var(--slate-600); font-weight: 400; }
+
+    /* ── Sections ── */
+    .section {
+      background: white;
+      border: 1px solid var(--slate-200);
+      border-radius: 20px;
+      padding: 48px;
+      margin-bottom: 40px;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 32px;
+      padding-bottom: 20px;
+      border-bottom: 3px solid var(--slate-100);
+    }
+    .section-num {
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, var(--primary), #8b5cf6);
+      color: white; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 800; flex-shrink: 0;
+    }
+    .section-title { font-size: 26px; font-weight: 800; color: var(--slate-800); }
+    .section-subtitle { font-size: 14px; color: var(--slate-400); margin-top: 2px; }
+
+    /* ── Wireframe-Boxen ── */
+    .wireframe {
+      background: var(--wire-bg);
+      border: 2px dashed var(--wire-dark);
+      border-radius: 16px;
+      padding: 24px;
+      margin: 24px 0;
+      font-family: 'Courier New', monospace;
+    }
+    .wireframe-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--wire-text);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .wireframe-title::before { content: '◈'; font-size: 14px; }
+
+    /* ── ASCII-Wireframe ── */
+    .ascii-frame {
+      background: #1e1b4b;
+      color: #a5b4fc;
+      border-radius: 12px;
+      padding: 20px 24px;
+      font-size: 13px;
+      line-height: 1.5;
+      overflow-x: auto;
+      white-space: pre;
+      margin: 16px 0;
+    }
+    .ascii-frame .c-nav   { color: #818cf8; }
+    .ascii-frame .c-hero  { color: #6ee7b7; }
+    .ascii-frame .c-card  { color: #fcd34d; }
+    .ascii-frame .c-cta   { color: #f9a8d4; }
+    .ascii-frame .c-dim   { color: #475569; }
+    .ascii-frame .c-amber { color: #fbbf24; }
+    .ascii-frame .c-green { color: #34d399; }
+    .ascii-frame .c-red   { color: #f87171; }
+
+    /* ── Info-Grid ── */
+    .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 24px 0; }
+    .info-grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .info-card {
+      background: var(--slate-50);
+      border: 1px solid var(--slate-200);
+      border-radius: 14px;
+      padding: 20px;
+    }
+    .info-card h4 { font-size: 13px; font-weight: 700; color: var(--slate-800); margin-bottom: 8px; }
+    .info-card ul { list-style: none; }
+    .info-card li { font-size: 13px; color: var(--slate-600); padding: 3px 0; display: flex; align-items: flex-start; gap: 8px; }
+    .info-card li::before { content: '→'; color: var(--primary); font-size: 11px; margin-top: 3px; flex-shrink: 0; }
+
+    /* ── Tabelle ── */
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+    th { background: var(--slate-800); color: white; padding: 12px 16px; text-align: left; font-weight: 600; }
+    th:first-child { border-radius: 10px 0 0 0; }
+    th:last-child { border-radius: 0 10px 0 0; }
+    td { padding: 11px 16px; border-bottom: 1px solid var(--slate-100); color: var(--slate-700); }
+    tr:hover td { background: var(--slate-50); }
+    tr:last-child td { border-bottom: none; }
+
+    /* ── Badges ── */
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+    .badge-primary { background: #ede9fe; color: #5b21b6; }
+    .badge-green   { background: #d1fae5; color: #065f46; }
+    .badge-amber   { background: #fef3c7; color: #92400e; }
+    .badge-red     { background: #fee2e2; color: #991b1b; }
+    .badge-slate   { background: #f1f5f9; color: #475569; }
+    .badge-blue    { background: #dbeafe; color: #1e40af; }
+
+    /* ── Flow-Diagram ── */
+    .flow {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      flex-wrap: wrap;
+      margin: 20px 0;
+    }
+    .flow-step {
+      background: white;
+      border: 2px solid var(--wire-box);
+      border-radius: 12px;
+      padding: 14px 20px;
+      text-align: center;
+      min-width: 140px;
+    }
+    .flow-step .num { width: 28px; height: 28px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; margin: 0 auto 8px; }
+    .flow-step .label { font-size: 13px; font-weight: 600; color: var(--slate-800); }
+    .flow-step .desc { font-size: 11px; color: var(--slate-400); margin-top: 4px; }
+    .flow-arrow { font-size: 22px; color: var(--primary); padding: 0 8px; }
+
+    /* ── Komponenten-Legende ── */
+    .legend { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0; }
+    .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--slate-600); }
+    .legend-dot { width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; }
+
+    /* ── Notiz-Box ── */
+    .note {
+      background: #fefce8;
+      border-left: 4px solid #facc15;
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px;
+      font-size: 13px;
+      color: #713f12;
+      margin: 16px 0;
+    }
+    .note strong { font-weight: 700; }
+
+    .note-blue {
+      background: #eff6ff;
+      border-left-color: #3b82f6;
+      color: #1e3a5f;
+    }
+    .note-green {
+      background: #f0fdf4;
+      border-left-color: #22c55e;
+      color: #14532d;
+    }
+
+    /* ── Seitenumbruch für Print ── */
+    @media print {
+      .section { page-break-inside: avoid; }
+      .cover { page-break-after: always; }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .cover h1 { font-size: 32px; }
+      .cover-meta { grid-template-columns: 1fr; }
+      .info-grid { grid-template-columns: 1fr; }
+      .info-grid-3 { grid-template-columns: 1fr; }
+      .container { padding: 24px 16px; }
+      .section { padding: 28px 20px; }
+      .ascii-frame { font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- COVER                                                  -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-badge">Meilenstein 1 · Deliverable</div>
+  <h1>Wireframe-<span>Dokumentation</span></h1>
+  <p>KIPromptsPro – KI-Systemprompts Marketplace<br>Vollständige Seitenstruktur, Navigationspfade und UI-Komponentenspezifikation</p>
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <div class="label">Projekt</div>
+      <div class="value">KIPromptsPro</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Meilenstein</div>
+      <div class="value">1 – Wireframe</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Stand</div>
+      <div class="value">22. März 2025</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Status</div>
+      <div class="value" style="color:#6ee7b7">✓ Zur Genehmigung</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Plattform</div>
+      <div class="value">Cloudflare Pages</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Seiten gesamt</div>
+      <div class="value">12 Seiten</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- CONTAINER                                              -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="container">
+
+  <!-- ── Inhaltsverzeichnis ── -->
+  <div class="toc">
+    <h2>Inhaltsverzeichnis</h2>
+    <ul class="toc-list">
+      <li>
+        <a href="#s1"><span class="toc-num">1</span> Projektübersicht &amp; Seitenarchitektur</a>
+      </li>
+      <li>
+        <a href="#s2"><span class="toc-num">2</span> Globale Komponenten (Nav, Footer)</a>
+      </li>
+      <li>
+        <a href="#s3"><span class="toc-num">3</span> Startseite <code style="font-size:13px">/</code></a>
+        <ul class="toc-sub">
+          <li><a href="#s3-hero">3.1 Hero-Bereich</a></li>
+          <li><a href="#s3-cat">3.2 Kategorie-Übersicht</a></li>
+          <li><a href="#s3-products">3.3 Bestseller-Produkte</a></li>
+          <li><a href="#s3-how">3.4 How-It-Works</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#s4"><span class="toc-num">4</span> KI-Bots Bibliothek <code style="font-size:13px">/bots</code></a>
+      </li>
+      <li>
+        <a href="#s5"><span class="toc-num">5</span> Digitale Produkte <code style="font-size:13px">/digital</code></a>
+      </li>
+      <li>
+        <a href="#s6"><span class="toc-num">6</span> Analysen &amp; Studien <code style="font-size:13px">/analysen</code></a>
+      </li>
+      <li>
+        <a href="#s7"><span class="toc-num">7</span> Analyse Einzelseite (Paywall) <code style="font-size:13px">/analyse/:id</code></a>
+      </li>
+      <li>
+        <a href="#s8"><span class="toc-num">8</span> Produkt-Detailseite &amp; Checkout <code style="font-size:13px">/product/:id</code></a>
+      </li>
+      <li>
+        <a href="#s9"><span class="toc-num">9</span> Bot-Chat-Interface <code style="font-size:13px">/chat/:botId</code></a>
+      </li>
+      <li>
+        <a href="#s10"><span class="toc-num">10</span> Dashboard / Lizenzbereich <code style="font-size:13px">/dashboard</code></a>
+      </li>
+      <li>
+        <a href="#s11"><span class="toc-num">11</span> Success &amp; Analyse-Success Seiten</a>
+      </li>
+      <li>
+        <a href="#s12"><span class="toc-num">12</span> Rechtliche Seiten (Impressum, Datenschutz, AGB)</a>
+      </li>
+    </ul>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- SECTION 1: PROJEKTÜBERSICHT                        -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="section" id="s1">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div>
+        <div class="section-title">Projektübersicht &amp; Seitenarchitektur</div>
+        <div class="section-subtitle">Gesamtstruktur, Navigationspfade und Seitentypen</div>
+      </div>
+    </div>
+
+    <p style="color:var(--slate-600);margin-bottom:24px;">
+      KIPromptsPro ist ein Marketplace für KI-Systemprompts, Analysen, eBooks und Videokurse.
+      Die Plattform umfasst <strong>12 öffentliche Seiten</strong> sowie API-Endpunkte für Checkout,
+      Chat, Lizenz und Webhooks. Alle Seiten nutzen ein gemeinsames Layout (Nav + Footer).
+    </p>
+
+    <h3 style="font-size:16px;font-weight:700;color:var(--slate-800);margin-bottom:16px;">Sitemap</h3>
+    <div class="ascii-frame"><span class="c-hero">KIPromptsPro – Sitemap</span>
+<span class="c-dim">─────────────────────────────────────────────────────────────</span>
+<span class="c-nav">  / (Startseite)</span>
+<span class="c-dim">  ├──</span> <span class="c-hero">/bots</span>               <span class="c-dim">← KI-Bots Bibliothek (87 Bots)</span>
+<span class="c-dim">  │    └──</span> <span class="c-card">/product/:id</span>    <span class="c-dim">← Produkt-Detail + Checkout</span>
+<span class="c-dim">  │         └──</span> <span class="c-cta">/chat/:botId</span> <span class="c-dim">← Bot-Chat (nach Kauf)</span>
+<span class="c-dim">  ├──</span> <span class="c-hero">/digital</span>           <span class="c-dim">← eBooks, Videokurse, Whitepapers</span>
+<span class="c-dim">  │    └──</span> <span class="c-card">/product/:id</span>    <span class="c-dim">← Produkt-Detail + Checkout</span>
+<span class="c-dim">  ├──</span> <span class="c-amber">/analysen</span>          <span class="c-dim">← Analysen-Übersicht (Paywall)</span>
+<span class="c-dim">  │    └──</span> <span class="c-amber">/analyse/:id</span>    <span class="c-dim">← Einzelanalyse + Paywall</span>
+<span class="c-dim">  ├──</span> <span class="c-green">/dashboard</span>         <span class="c-dim">← Lizenz prüfen / Mein Bereich</span>
+<span class="c-dim">  ├──</span> <span class="c-green">/success</span>           <span class="c-dim">← Nach Bot/Digital-Kauf</span>
+<span class="c-dim">  ├──</span> <span class="c-amber">/analyse-success</span>   <span class="c-dim">← Nach Analysen-Kauf</span>
+<span class="c-dim">  ├──</span> <span class="c-dim">/impressum</span>
+<span class="c-dim">  ├──</span> <span class="c-dim">/datenschutz</span>
+<span class="c-dim">  └──</span> <span class="c-dim">/agb</span>
+
+<span class="c-nav">  API-Endpunkte (kein HTML-Rendering):</span>
+<span class="c-dim">  ├──</span> POST <span class="c-card">/api/checkout</span>
+<span class="c-dim">  ├──</span> GET  <span class="c-card">/api/checkout/success</span>
+<span class="c-dim">  ├──</span> POST <span class="c-amber">/api/analyse/checkout</span>
+<span class="c-dim">  ├──</span> GET  <span class="c-amber">/api/analyse/access</span>
+<span class="c-dim">  ├──</span> GET  <span class="c-amber">/api/analyse/success</span>
+<span class="c-dim">  ├──</span> POST <span class="c-chat">/api/chat</span>
+<span class="c-dim">  ├──</span> POST <span class="c-green">/api/license/check</span>
+<span class="c-dim">  ├──</span> POST <span class="c-green">/api/license/by-email</span>
+<span class="c-dim">  └──</span> POST <span class="c-dim">/api/webhook</span>       <span class="c-dim">← Stripe Webhook</span></div>
+
+    <h3 style="font-size:16px;font-weight:700;color:var(--slate-800);margin:28px 0 16px;">Seitentypen &amp; Eigenschaften</h3>
+    <table>
+      <thead><tr><th>Seite / Route</th><th>Typ</th><th>Auth erforderlich</th><th>Stripe-Verbindung</th></tr></thead>
+      <tbody>
+        <tr><td><code>/</code></td><td><span class="badge badge-slate">Marketing</span></td><td>Nein</td><td>Nein</td></tr>
+        <tr><td><code>/bots</code></td><td><span class="badge badge-primary">Katalog</span></td><td>Nein</td><td>Nein</td></tr>
+        <tr><td><code>/digital</code></td><td><span class="badge badge-primary">Katalog</span></td><td>Nein</td><td>Nein</td></tr>
+        <tr><td><code>/analysen</code></td><td><span class="badge badge-amber">Paywall-Übersicht</span></td><td>Nein</td><td>Nein</td></tr>
+        <tr><td><code>/analyse/:id</code></td><td><span class="badge badge-amber">Paywall-Inhalt</span></td><td>Lizenzschlüssel</td><td>Checkout</td></tr>
+        <tr><td><code>/product/:id</code></td><td><span class="badge badge-blue">Checkout</span></td><td>Nein</td><td>Checkout</td></tr>
+        <tr><td><code>/chat/:botId</code></td><td><span class="badge badge-primary">App</span></td><td>Lizenzschlüssel</td><td>Nein</td></tr>
+        <tr><td><code>/dashboard</code></td><td><span class="badge badge-green">Self-Service</span></td><td>E-Mail</td><td>Nein</td></tr>
+        <tr><td><code>/success</code></td><td><span class="badge badge-green">Bestätigung</span></td><td>Session-ID</td><td>Retrieve</td></tr>
+        <tr><td><code>/analyse-success</code></td><td><span class="badge badge-amber">Bestätigung</span></td><td>Session-ID</td><td>Retrieve</td></tr>
+        <tr><td><code>/impressum</code> etc.</td><td><span class="badge badge-slate">Legal</span></td><td>Nein</td><td>Nein</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- SECTION 2: GLOBALE KOMPONENTEN                     -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="section" id="s2">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <div>
+        <div class="section-title">Globale Komponenten</div>
+        <div class="section-subtitle">Navigation und Footer – erscheinen auf allen Seiten</div>
+      </div>
+    </div>
+
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:12px;">2.1 Navigation (sticky, top)</h3>
+    <div class="ascii-frame"><span class="c-dim">┌──────────────────────────────────────────────────────────────────────────────────┐</span>
+<span class="c-dim">│</span> <span class="c-nav">🤖 KIPromptsPro</span>   <span class="c-hero">Produkte</span>  <span class="c-hero">KI-Bots</span>  <span class="c-hero">eBooks & Kurse</span>  <span class="c-amber">⬆ Analysen</span>  <span class="c-hero">Mein Bereich</span>   <span class="c-cta">[ 🔑 Lizenzen ]</span> <span class="c-dim">│</span>
+<span class="c-dim">└──────────────────────────────────────────────────────────────────────────────────┘</span>
+  <span class="c-dim">bg-slate-900  sticky top-0 z-50</span>                                 <span class="c-dim">bg-indigo-600 Button</span></div>
+
+    <div class="info-grid" style="margin-top:20px;">
+      <div class="info-card">
+        <h4>Navigation-Links (Desktop)</h4>
+        <ul>
+          <li>Logo „KIPromptsPro" → /</li>
+          <li>Produkte → /#products (Anchor)</li>
+          <li>KI-Bots → /bots</li>
+          <li>eBooks &amp; Kurse → /digital</li>
+          <li>⬆ Analysen → /analysen (amber-Farbe, Icon)</li>
+          <li>Mein Bereich → /dashboard</li>
+        </ul>
+      </div>
+      <div class="info-card">
+        <h4>Navigation-CTA &amp; Verhalten</h4>
+        <ul>
+          <li>„Lizenzen"-Button: bg-indigo-600, rechts</li>
+          <li>Sticky: bleibt beim Scrollen oben</li>
+          <li>z-index: 50 (über allem)</li>
+          <li>Mobile: Hamburger-Menü (hidden md:flex)</li>
+          <li>Aktiver Link: text-indigo-300 on hover</li>
+          <li>Analysen-Link: text-amber-400 (Sonderfarbe)</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 style="font-size:15px;font-weight:700;margin:28px 0 12px;">2.2 Footer (4-Spalten-Grid)</h3>
+    <div class="ascii-frame"><span class="c-dim">┌──────────────────────────────────────────────────────────────────────────────────┐</span>
+<span class="c-dim">│  bg-slate-900                                                                    │</span>
+<span class="c-dim">│  ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐ ┌───────────────┐ │</span>
+<span class="c-dim">│  │</span> <span class="c-nav">🤖 KIPromptsPro  </span><span class="c-dim">│ │</span> <span class="c-hero">Produkte         </span><span class="c-dim">│ │</span> <span class="c-green">Support          </span><span class="c-dim">│ │</span><span class="c-red"> Rechtliches   </span><span class="c-dim">│ │</span>
+<span class="c-dim">│  │</span> 90 professionelle<span class="c-dim">│ │</span> KI-Bots         <span class="c-dim">│ │</span> Lizenz prüfen   <span class="c-dim">│ │</span> Impressum     <span class="c-dim">│ │</span>
+<span class="c-dim">│  │</span> KI-Systemprompts <span class="c-dim">│ │</span> eBooks          <span class="c-dim">│ │</span> Kontakt         <span class="c-dim">│ │</span> Datenschutz   <span class="c-dim">│ │</span>
+<span class="c-dim">│  │</span>                  <span class="c-dim">│ │</span> Kurse           <span class="c-dim">│ │</span>                 <span class="c-dim">│ │</span> AGB           <span class="c-dim">│ │</span>
+<span class="c-dim">│  │</span>                  <span class="c-dim">│ │</span> <span class="c-amber">Analysen         </span><span class="c-dim">│ │</span>                 <span class="c-dim">│ │</span>               <span class="c-dim">│ │</span>
+<span class="c-dim">│  └─────────────────┘ └─────────────────┘ └─────────────────┘ └───────────────┘ │</span>
+<span class="c-dim">│  ─────────────────────────────────────────────────────────────────────────────  │</span>
+<span class="c-dim">│  © 2024 KIPromptsPro – Alle Rechte vorbehalten              💳 Zahlung via Stripe│</span>
+<span class="c-dim">└──────────────────────────────────────────────────────────────────────────────────┘</span></div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- SECTION 3: STARTSEITE                              -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="section" id="s3">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <div>
+        <div class="section-title">Startseite <code style="font-size:18px;color:var(--primary)">/</code></div>
+        <div class="section-subtitle">4 Sektionen: Hero → Kategorien → Bestseller → How-It-Works</div>
+      </div>
+    </div>
+
+    <div id="s3-hero">
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:12px;">3.1 Hero-Bereich</h3>
+      <div class="ascii-frame"><span class="c-dim">┌──────────────────────────────────────────────────────────────────────────────────┐</span>
+<span class="c-dim">│</span>  <span class="c-dim">gradient-hero: #0f172a → #1e1b4b → #0f172a    py-24</span>                           <span class="c-dim">│</span>
+<span class="c-dim">│                                                                                  │</span>
+<span class="c-dim">│</span>              <span class="c-card">[ ✨ 90 professionelle KI-Systemprompts ]</span>  <span class="c-dim">← Badge (pill)</span>           <span class="c-dim">│</span>
+<span class="c-dim">│</span>                                                                                  <span class="c-dim">│</span>
+<span class="c-dim">│</span>                  <span class="c-hero">KI-Power für Ihr</span>                                              <span class="c-dim">│</span>
+<span class="c-dim">│</span>                  <span class="c-nav">Business</span>          <span class="c-dim">← text-indigo-400, text-5xl/6xl extrabold</span>  <span class="c-dim">│</span>
+<span class="c-dim">│</span>                                                                                  <span class="c-dim">│</span>
+<span class="c-dim">│</span>       <span class="c-dim">Einsatzbereite KI-Bots, eBooks, Videokurse und SaaS-Tools...</span>              <span class="c-dim">│</span>
+<span class="c-dim">│</span>                                                                                  <span class="c-dim">│</span>
+<span class="c-dim">│</span>          <span class="c-cta">[ 🚀 Produkte entdecken ]</span>     <span class="c-dim">[ 🔑 Lizenz prüfen ]</span>                   <span class="c-dim">│</span>
+<span class="c-dim">│</span>          <span class="c-dim">btn-primary (gradient)        bg-white/10 (glass)</span>                      <span class="c-dim">│</span>
+<span class="c-dim">│</span>                                                                                  <span class="c-dim">│</span>
+<span class="c-dim">│</span>    <span class="c-green">🛡 SSL-verschlüsselt</span>  <span class="c-nav">💳 Stripe</span>  <span class="c-card">⚡ Sofortiger Zugriff</span>  <span class="c-hero">↩ 14 Tage Rückgabe</span>   <span class="c-dim">│</span>
+<span class="c-dim">│</span>    <span class="c-dim">──────────── Trust Badges (flex-wrap, text-slate-400) ────────────</span>           <span class="c-dim">│</span>
+<span class="c-dim">└──────────────────────────────────────────────────────────────────────────────────┘</span></div>
+    </div>
+
+    <div id="s3-cat" style="margin-top:28px;">
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:12px;">3.2 Kategorie-Übersicht (5 Kacheln)</h3>
+      <div class="ascii-frame"><span class="c-dim">┌──────────────────────────────────────────────────────────────────────────────────┐</span>
+<span class="c-dim">│</span>  <span class="c-hero">Was wir anbieten</span>   <span class="c-dim">grid-cols-2 md:grid-cols-5  bg-white  py-16</span>              <span class="c-dim">│</span>
+<span class="c-dim">│                                                                                  │</span>
+<span class="c-dim">│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────────────┐  │</span>
+<span class="c-dim">│  │</span> <span class="c-nav">🤖</span>        <span class="c-dim">│  │</span> <span class="c-green">📖</span>        <span class="c-dim">│  │</span> <span class="c-red">▶</span>         <span class="c-dim">│  │</span> <span class="c-card">📄</span>        <span class="c-dim">│  │</span> <span class="c-amber">📈              </span> <span class="c-dim">│  │</span>
+<span class="c-dim">│  │</span> KI-Bots   <span class="c-dim">│  │</span> eBooks    <span class="c-dim">│  │</span> Videokurse<span class="c-dim">│  │</span> Whitepapers<span class="c-dim">│  │</span> <span class="c-amber">Analysen         </span><span class="c-dim">│  │</span>
+<span class="c-dim">│  │</span> bg-indigo <span class="c-dim">│  │</span> bg-emerald<span class="c-dim">│  │</span> bg-rose  <span class="c-dim">│  │</span> bg-amber  <span class="c-dim">│  │</span> <span class="c-amber">bg-yellow        </span><span class="c-dim">│  │</span>
+<span class="c-dim">│  └──────────┘  └──────────┘  └──────────┘  └──────────┘  └──────────────────┘  │</span>
+<span class="c-dim">│</span>  <span class="c-dim">card-hover, rounded-2xl, p-6, text-center, href jeweils auf Sektion</span>           <span class="c-dim">│</span>
+<span class="c-dim">└──────────────────────────────────────────────────────────────────────────────────┘</span></div>
+    </div>
+
+    <div id="s3-products" style="margin-top:28px;">
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:12px;">3.3 Bestseller-Produkte (3+3 Karten)</h3>
+      <div class="ascii-frame"><span class="c-dim">┌──────────────────────────────────────────────────────────────────────────────────┐</span>
+<span class="c-dim">│</span>  <span class="c-hero">Bestseller</span>   <span class="c-dim">grid md:grid-cols-2 lg:grid-cols-3  id="products"</span>              <span class="c-dim">│</span>
+<span class="c-dim">│                                                                                  │</span>
+<span class="c-dim">│  ┌───────────────────┐  ┌───────────────────┐  ┌───────────────────┐           │</span>
+<span class="c-dim">│  │</span> <span class="c-nav">████ Bot-Banner ████</span><span class="c-dim">│  │</span> <span class="c-hero">████ Bot-Banner ████</span><span class="c-dim">│  │</span> <span class="c-green">████ eBook-Banner ██</span><span class="c-dim">│           │</span>
+<span class="c-dim">│  │</span> [Kategorie] [Badge]<span class="c-dim">│  │</span> [Kategorie] [Badge]<span class="c-dim">│  │</span> [Kategorie]        <span class="c-dim">│           │</span>
+<span class="c-dim">│  │</span> Name               <span class="c-dim">│  │</span> Name               <span class="c-dim">│  │</span> Name               <span class="c-dim">│           │</span>
+<span class="c-dim">│  │</span> Beschreibung...    <span class="c-dim">│  │</span> Beschreibung...    <span class="c-dim">│  │</span> Beschreibung...    <span class="c-dim">│           │</span>
+<span class="c-dim">│  │</span> €XX     [Kaufen →] <span class="c-dim">│  │</span> €XX     [Kaufen →] <span class="c-dim">│  │</span> €XX     [Kaufen →] <span class="c-dim">│           │</span>
+<span class="c-dim">│  └───────────────────┘  └───────────────────┘  └───────────────────┘           │</span>
+<span class="c-dim">│                                                                                  │</span>
+<span class="c-dim">│</span>              <span class="c-nav">[ Alle KI-Bots → ]</span>       <span class="c-dim">[ Alle Kurse & eBooks ]</span>                <span class="c-dim">│</span>
+<span class="c-dim">└──────────────────────────────────────────────────────────────────────────────────┘</span></div>
+    </div>
+
+    <div id="s3-how" style="margin-top:28px;">
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:12px;">3.4 How-It-Works (3 Schritte)</h3>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="num">1</div>
+          <div class="label">Produkt wählen</div>
+          <div class="desc">Bot, Analyse oder eBook auswählen</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="num">2</div>
+          <div class="label">Sicher bezahlen</div>
+          <div class="desc">Stripe Checkout (Karte, SEPA…)</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="num">3</div>
+          <div class="label">Sofort nutzen</div>
+          <div class="desc">Lizenzschlüssel → Zugang</div>
+        </div>
+      </div>
+      <p style="font-size:13px;color:var(--slate-400);">Hintergrund: bg-gradient slate-900 → indigo-950, text-white</p>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- SECTION 4: KI-BOTS                                 -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="section" id="s4">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <div>
+        <div class="section-title">KI-Bots Bibliothek <code style="font-size:18px;color:var(--primary)">/bots</code></div>
+        <div class="section-subtitle">87 Bots mit Echtzeit-Suche und Kategorie-Filter</div>
+      </div>
+    </div>
+
+    <div class="ascii-frame"><span class="c-dim">┌──────────────────────────────────────────────────────────────────────────────────┐</span>
+<span class="c-dim">│</span>  <span class="c-nav">🤖 KI-Bots Bibliothek</span>   <span class="c-dim">gradient-hero  py-16</span>                                <span class="c-dim">│</span>
+<span class="c-dim">│</span>     87 Bots in N Kategorien                                                      <span class="c-dim">│</span>
+<span class="c-dim">├──────────────────────────────────────────────────────────────────────────────────┤</span>
+<span class="c-dim">│</span>                                                                                  <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">┌──────────────────────────────────────────────┐</span>  <span class="c-hero">42 Bots gefunden</span>           <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span> 🔍 Bot suchen (Name, Kategorie, Beschreibung) <span class="c-dim">│</span>  <span class="c-dim">← Echtzeit oninput</span>        <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">└──────────────────────────────────────────────┘</span>                              <span class="c-dim">│</span>
+<span class="c-dim">│</span>                                                                                  <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-nav">[Alle]</span> <span class="c-dim">[Programmierung(N)] [Recht(N)] [Kunst(N)] [Business(N)] [Finanzen(N)]</span>   <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">[Analyse(N)] [Gesundheit(N)] [Content(N)] [Sprache(N)] [Astro(N)] ...</span>         <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">← Kategorie-Pills: aktiv=bg-indigo-600, inaktiv=bg-white border</span>               <span class="c-dim">│</span>
+<span class="c-dim">│</span>                                                                                  <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">grid md:grid-cols-2 lg:grid-cols-3</span>                                             <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐</span>                <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span> <span class="c-nav">████ indigo ████</span> <span class="c-dim">│  │</span> <span class="c-nav">████ indigo ████</span> <span class="c-dim">│  │</span> <span class="c-nav">████ indigo ████</span> <span class="c-dim">│</span>                <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span> 🤖   [Einmalig] <span class="c-dim">│  │</span> 🤖   [Abo]      <span class="c-dim">│  │</span> 🤖   [Badge]    <span class="c-dim">│</span>                <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span> [Kategorie]     <span class="c-dim">│  │</span> [Kategorie]     <span class="c-dim">│  │</span> [Kategorie]     <span class="c-dim">│</span>                <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span> Botname         <span class="c-dim">│  │</span> Botname         <span class="c-dim">│  │</span> Botname         <span class="c-dim">│</span>                <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span> shortDesc       <span class="c-dim">│  │</span> shortDesc       <span class="c-dim">│  │</span> shortDesc       <span class="c-dim">│</span>                <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span> ✓ Feature 1     <span class="c-dim">│  │</span> ✓ Feature 1     <span class="c-dim">│  │</span> ✓ Feature 1     <span class="c-dim">│</span>                <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span> ✓ Feature 2     <span class="c-dim">│  │</span> ✓ Feature 2     <span class="c-dim">│  │</span> ✓ Feature 2     <span class="c-dim">│</span>                <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span> €XX  [Kaufen →] <span class="c-dim">│  │</span> €XX/Mo[Kaufen→] <span class="c-dim">│  │</span> €XX  [Kaufen →] <span class="c-dim">│</span>                <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">└─────────────────┘  └─────────────────┘  └─────────────────┘</span>                <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">← Bot-Grid wird client-seitig via JS renderBots() befüllt</span>                    <span class="c-dim">│</span>
+<span class="c-dim">└──────────────────────────────────────────────────────────────────────────────────┘</span></div>
+
+    <div class="note note-blue" style="margin-top:16px;">
+      <strong>Interaktivität:</strong> Die gesamte Filterfunktion (Suche + Kategoriewechsel) läuft client-seitig via eingebettetem JavaScript (<code>ALL_BOTS</code> JSON-Array). Kein API-Call bei jeder Filterung.
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- SECTION 5: DIGITALE PRODUKTE                       -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="section" id="s5">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <div>
+        <div class="section-title">Digitale Produkte <code style="font-size:18px;color:var(--primary)">/digital</code></div>
+        <div class="section-subtitle">eBooks, Videokurse, Whitepapers und Bundles</div>
+      </div>
+    </div>
+
+    <div class="ascii-frame"><span class="c-dim">┌──────────────────────────────────────────────────────────────────────────────────┐</span>
+<span class="c-dim">│</span>  <span class="c-green">🎓 eBooks, Kurse & Whitepapers</span>   <span class="c-dim">gradient-hero  py-16</span>                       <span class="c-dim">│</span>
+<span class="c-dim">├──────────────────────────────────────────────────────────────────────────────────┤</span>
+<span class="c-dim">│</span>  <span class="c-dim">grid md:grid-cols-2 lg:grid-cols-3  py-16</span>                                      <span class="c-dim">│</span>
+<span class="c-dim">│</span>                                                                                  <span class="c-dim">│</span>
+<span class="c-dim">│</span>  Karten-Farben nach Typ:                                                         <span class="c-dim">│</span>
+<span class="c-dim">│</span>   <span class="c-green">ebook     → from-emerald-500 to-teal-600    📖</span>                               <span class="c-dim">│</span>
+<span class="c-dim">│</span>   <span class="c-card">whitepaper → from-amber-500 to-orange-500   📄</span>                               <span class="c-dim">│</span>
+<span class="c-dim">│</span>   <span class="c-red">video     → from-rose-500 to-pink-600       ▶</span>                                <span class="c-dim">│</span>
+<span class="c-dim">│</span>   <span class="c-nav">bundle    → from-purple-500 to-indigo-600   🗂</span>                               <span class="c-dim">│</span>
+<span class="c-dim">│</span>                                                                                  <span class="c-dim">│</span>
+<span class="c-dim">│</span>  Karte enthält: Typ-Label, Badge?, Name, Beschreibung, Features (3), Preis, CTA  <span class="c-dim">│</span>
+<span class="c-dim">└──────────────────────────────────────────────────────────────────────────────────┘</span></div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- SECTION 6: ANALYSEN ÜBERSICHT                      -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="section" id="s6">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <div>
+        <div class="section-title">Analysen &amp; Studien <code style="font-size:18px;color:var(--amber)">/analysen</code></div>
+        <div class="section-subtitle">Paywall-Übersicht – 6 Analysen mit Kategorie-Filter und How-It-Works</div>
+      </div>
+    </div>
+
+    <div class="ascii-frame"><span class="c-dim">┌──────────────────────────────────────────────────────────────────────────────────┐</span>
+<span class="c-dim">│</span>  <span class="c-amber">📈 KI-Analysen & Studien</span>   <span class="c-dim">bg-gradient slate-900→amber-950→slate-900  py-16</span>  <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">[ 🔒 Exklusive Paywall-Analysen ]</span>  Badge                                       <span class="c-dim">│</span>
+<span class="c-dim">│</span>  6 Analysen verfügbar                                                            <span class="c-dim">│</span>
+<span class="c-dim">├──────────────────────────────────────────────────────────────────────────────────┤</span>
+<span class="c-dim">│</span>                                                                                  <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-amber">[Alle]</span> <span class="c-dim">[KI & Automatisierung(2)] [Marktanalyse(1)] [Recht & Compliance(1)]</span>     <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">[Business & Strategie(1)] [Finanzanalyse(1)]</span>                                   <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">← aktiv=bg-amber-600, inaktiv=bg-white border hover:border-amber</span>               <span class="c-dim">│</span>
+<span class="c-dim">│</span>                                                                                  <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">grid md:grid-cols-2 lg:grid-cols-3</span>                                             <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">┌─────────────────────────┐  ┌─────────────────────────┐</span>                       <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span> <span class="c-amber">████ amber-Banner ███████</span> <span class="c-dim">│  │</span> <span class="c-amber">████ amber-Banner ███████</span> <span class="c-dim">│</span>                       <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span> 📈   [Badge?]  [🔒Paywall]<span class="c-dim">│  │</span> 📈   [Bestseller][🔒Paywall]<span class="c-dim">│</span>                       <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span> [Kategorie]  📄 N Seiten  <span class="c-dim">│  │</span> [Kategorie]  📄 N Seiten  <span class="c-dim">│</span>                       <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span> <span class="c-hero">Themenüberschrift (title) </span><span class="c-dim">│  │</span> <span class="c-hero">Themenüberschrift (title) </span><span class="c-dim">│</span>                       <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span> shortDesc (3 Zeilen)     <span class="c-dim">│  │</span> shortDesc (3 Zeilen)     <span class="c-dim">│</span>                       <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span> <span class="c-amber">€XX einmalig</span>             <span class="c-dim">│  │</span> <span class="c-amber">€XX einmalig</span>             <span class="c-dim">│</span>                       <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span> 📅 Aktualisiert: TT.MM.JJ<span class="c-dim">│  │</span> 📅 Aktualisiert: TT.MM.JJ<span class="c-dim">│</span>                       <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>            [Details →]   <span class="c-dim">│  │</span>            [Details →]   <span class="c-dim">│</span>                       <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">└─────────────────────────┘  └─────────────────────────┘</span>                       <span class="c-dim">│</span>
+<span class="c-dim">│</span>                                                                                  <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">─────────── How-It-Works Box (amber-50, border amber) ───────────</span>               <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span> 🔒  So funktioniert der Zugang                                  <span class="c-dim">│</span>               <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  [1] Analyse wählen  →  [2] Bezahlen  →  [3] Schlüssel nutzen  <span class="c-dim">│</span>               <span class="c-dim">│</span>
+<span class="c-dim">└──────────────────────────────────────────────────────────────────────────────────┘</span></div>
+
+    <h3 style="font-size:15px;font-weight:700;margin:24px 0 12px;">Analyse-Karte – Pflichtfelder</h3>
+    <table>
+      <thead><tr><th>Feld</th><th>Quelle</th><th>Anzeige</th></tr></thead>
+      <tbody>
+        <tr><td><strong>title</strong></td><td>AnalyseEntry.title</td><td>Themenüberschrift, h3, 2 Zeilen max</td></tr>
+        <tr><td><strong>shortDesc</strong></td><td>AnalyseEntry.shortDesc</td><td>Kurzbeschreibung Scope, 3 Zeilen (line-clamp-3)</td></tr>
+        <tr><td><strong>lastUpdated</strong></td><td>AnalyseEntry.lastUpdated (ISO)</td><td>Formatiert: „TT. Monat JJJJ"</td></tr>
+        <tr><td><strong>category</strong></td><td>AnalyseEntry.category</td><td>Kategorie-Pill, farbcodiert</td></tr>
+        <tr><td><strong>pageCount</strong></td><td>AnalyseEntry.pageCount</td><td>„N Seiten" Icon 📄 (optional)</td></tr>
+        <tr><td><strong>price</strong></td><td>AnalyseEntry.price (Cent)</td><td>„€XX,XX einmalig" in amber</td></tr>
+        <tr><td><strong>badge</strong></td><td>AnalyseEntry.badge</td><td>Optional: „Neu", „Bestseller" etc.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- SECTION 7: ANALYSE EINZELSEITE (PAYWALL)           -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="section" id="s7">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <div>
+        <div class="section-title">Analyse Einzelseite (Paywall) <code style="font-size:18px;color:var(--amber)">/analyse/:id</code></div>
+        <div class="section-subtitle">2-Spalten-Layout: Inhalt links, Checkout-Box rechts – mit Lizenz-Unlock</div>
+      </div>
+    </div>
+
+    <div class="ascii-frame"><span class="c-dim">┌──────────────────────────────────────────────────────────────────────────────────┐</span>
+<span class="c-dim">│</span>  <span class="c-dim">← Alle Analysen</span>                                                               <span class="c-dim">│</span>
+<span class="c-dim">│</span>                                                                                  <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">grid md:grid-cols-5</span>                                                            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">┌──────────────────────────────────┐  ┌──────────────────────────┐</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  <span class="c-dim">col-span-3 (LEFT)</span>               <span class="c-dim">│  │</span> <span class="c-dim">col-span-2 (RIGHT, sticky)</span><span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>                                  <span class="c-dim">│  │</span>                          <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  <span class="c-amber">████ amber-Header-Card ████████</span>  <span class="c-dim">│  │</span>  <span class="c-amber">€XX,XX</span>                  <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  📈  [Badge]  [🔒 Paywall]       <span class="c-dim">│  │</span>  einmalige Zahlung       <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  [Kategorie]                      <span class="c-dim">│  │</span>  ─────────────────────── <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  <span class="c-hero">Themenüberschrift</span>                 <span class="c-dim">│  │</span>  Was Sie erhalten:       <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  📅 Aktualisiert  📄 N Seiten     <span class="c-dim">│  │</span>  ✓ N Seiten Analyse      <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>                                  <span class="c-dim">│  │</span>  ✓ Lizenzschlüssel       <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  <span class="c-dim">┌ Über diese Analyse ──────────┐</span>  <span class="c-dim">│  │</span>  ✓ Aktualisiert: Datum   <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  <span class="c-dim">│</span> fullDesc                     <span class="c-dim">│  │  │</span>  ✓ Online-Zugang         <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  <span class="c-dim">└─────────────────────────────┘</span>  <span class="c-dim">│  │</span>                          <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>                                  <span class="c-dim">│  │</span>  📧 E-Mail-Adresse       <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  <span class="c-dim">┌ 👁 Vorschau (amber-50) ──────┐</span>  <span class="c-dim">│  │</span>  [ihre@email.de        ] <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  <span class="c-dim">│</span> previewHtml (öffentlich)     <span class="c-dim">│  │  │</span>                          <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  <span class="c-dim">│</span> 🔒 Vollinhalt nach Kauf      <span class="c-dim">│  │  │</span>  <span class="c-amber">[ 🔒 Jetzt kaufen ]</span>     <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  <span class="c-dim">└─────────────────────────────┘</span>  <span class="c-dim">│  │</span>  <span class="c-dim">amber-gradient Button</span>    <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>                                  <span class="c-dim">│  │</span>                          <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  <span class="c-dim">┌ 🔒 PAYWALL GATE (slate-900) ─┐</span>  <span class="c-dim">│  │</span>  Trust-Badges:           <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  <span class="c-dim">│</span> 🔒  Vollständiger Inhalt      <span class="c-dim">│  │  │</span>  Stripe / SSL / 14 Tage  <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  <span class="c-dim">│</span>     gesperrt                 <span class="c-dim">│  └──────────────────────────┘</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  <span class="c-dim">│</span> Bereits gekauft?             <span class="c-dim">│</span>                                            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  <span class="c-dim">│</span> [XXXX-XXXX-XXXX-XXXX] [🔓]  <span class="c-dim">│</span>                                            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  <span class="c-dim">└─────────────────────────────┘</span>  <span class="c-dim">│</span>                                            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>                                  <span class="c-dim">│</span>                                            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  <span class="c-dim">[ VOLLINHALT – nach Unlock ] </span>    <span class="c-dim">│</span>                                            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  <span class="c-green">✓ Zugang gewährt</span>                 <span class="c-dim">│</span>                                            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  prose-Inhalt (HTML)             <span class="c-dim">│</span>                                            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">└──────────────────────────────────┘</span>                                            <span class="c-dim">│</span>
+<span class="c-dim">└──────────────────────────────────────────────────────────────────────────────────┘</span></div>
+
+    <h3 style="font-size:15px;font-weight:700;margin:24px 0 12px;">Paywall-Unlock-Flow</h3>
+    <div class="flow">
+      <div class="flow-step" style="border-color:#fbbf24;">
+        <div class="num" style="background:#f59e0b;">A</div>
+        <div class="label">Kein Schlüssel</div>
+        <div class="desc">Paywall Gate sichtbar, Inhalt hidden</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:#fbbf24;">
+        <div class="num" style="background:#f59e0b;">B</div>
+        <div class="label">Schlüssel eingeben</div>
+        <div class="desc">GET /api/analyse/access</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:#22c55e;">
+        <div class="num" style="background:#10b981;">C</div>
+        <div class="label">Inhalt sichtbar</div>
+        <div class="desc">Gate hidden, contentHtml eingeblendet</div>
+      </div>
+    </div>
+    <div class="note note-green">
+      <strong>Session-Persistenz:</strong> Eingegebener Schlüssel wird im <code>sessionStorage</code> gespeichert. Beim Seitenreload wird er automatisch wiederhergestellt und der Unlock-Check erneut ausgeführt.
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- SECTION 8: PRODUKT-DETAIL + CHECKOUT               -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="section" id="s8">
+    <div class="section-header">
+      <div class="section-num">8</div>
+      <div>
+        <div class="section-title">Produkt-Detailseite &amp; Checkout <code style="font-size:18px;color:var(--primary)">/product/:id</code></div>
+        <div class="section-subtitle">2-Spalten-Layout für alle Produkte (Bots, eBooks, Videos)</div>
+      </div>
+    </div>
+
+    <div class="ascii-frame"><span class="c-dim">┌──────────────────────────────────────────────────────────────────────────────────┐</span>
+<span class="c-dim">│</span>  <span class="c-dim">grid md:grid-cols-5   max-w-5xl mx-auto  py-12</span>                               <span class="c-dim">│</span>
+<span class="c-dim">│</span>                                                                                  <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">┌──────────────────────────────────┐  ┌──────────────────────────┐</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  col-span-3 (LEFT)               <span class="c-dim">│  │</span> col-span-2 RIGHT (sticky)<span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>                                  <span class="c-dim">│  │</span>                          <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  <span class="c-nav">████ Gradient-Banner ████████████</span> <span class="c-dim">│  │</span>  <span class="c-nav">€XX,XX</span>                  <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  🤖 (Icon 8xl)                   <span class="c-dim">│  │</span>  einmalig / pro Monat    <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  [Kategorie]                     <span class="c-dim">│  │</span>  ─────────────────────── <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>                                  <span class="c-dim">│  │</span>  📧 E-Mail-Adresse       <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  <span class="c-hero">Produktname (h1, 3xl)</span>            <span class="c-dim">│  │</span>  [ihre@email.de        ] <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  [Badge]                         <span class="c-dim">│  │</span>                          <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  Beschreibung                    <span class="c-dim">│  │</span>  <span class="c-nav">[ 🔒 Jetzt kaufen  ]</span>    <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>                                  <span class="c-dim">│  │</span>  btn-primary Gradient    <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  <span class="c-dim">┌ Was du bekommst ─────────────┐</span>  <span class="c-dim">│  │</span>                          <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  <span class="c-dim">│</span> ✓ Feature 1                  <span class="c-dim">│  │  │</span>  Stripe-Logo            <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  <span class="c-dim">│</span> ✓ Feature 2                  <span class="c-dim">│  │  │</span>  🛡 SSL                 <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  <span class="c-dim">│</span> ✓ Feature N                  <span class="c-dim">│  │  │</span>  ⚡ Sofortiger Zugriff  <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  <span class="c-dim">└─────────────────────────────┘</span>  <span class="c-dim">│  │</span>  ↩ 14 Tage Rückgabe     <span class="c-dim">│</span>            <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">└──────────────────────────────────┘  └──────────────────────────┘</span>            <span class="c-dim">│</span>
+<span class="c-dim">└──────────────────────────────────────────────────────────────────────────────────┘</span></div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- SECTION 9: BOT-CHAT-INTERFACE                      -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="section" id="s9">
+    <div class="section-header">
+      <div class="section-num">9</div>
+      <div>
+        <div class="section-title">Bot-Chat-Interface <code style="font-size:18px;color:var(--primary)">/chat/:botId</code></div>
+        <div class="section-subtitle">Vollbild-Chat mit Lizenz-Gate, Bot-Info-Panel und Chat-Widget</div>
+      </div>
+    </div>
+
+    <div class="ascii-frame"><span class="c-dim">┌──────────────────────────────────────────────────────────────────────────────────┐</span>
+<span class="c-dim">│</span>  <span class="c-dim">max-w-6xl mx-auto py-8  grid md:grid-cols-3</span>                                   <span class="c-dim">│</span>
+<span class="c-dim">│</span>                                                                                  <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">┌─────────────────────┐  ┌──────────────────────────────────────────────────┐</span> <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span> col-span-1 (INFO)   <span class="c-dim">│  │</span> col-span-2  CHAT-WIDGET (height: 640px)          <span class="c-dim">│</span> <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>                     <span class="c-dim">│  │</span>                                                  <span class="c-dim">│</span> <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span> <span class="c-nav">████ Avatar ████████</span> <span class="c-dim">│  │</span>  <span class="c-dim">┌ LICENSE-GATE (hidden nach Unlock) ────────┐</span>  <span class="c-dim">│</span> <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span> Bot-Name             <span class="c-dim">│  │</span>  <span class="c-dim">│</span>  🔒 Lizenzschlüssel eingeben               <span class="c-dim">│</span>  <span class="c-dim">│</span> <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span> Kategorie-Badge      <span class="c-dim">│  │</span>  <span class="c-dim">│</span>  [XXXX-XXXX-XXXX-XXXX ] [Freischalten]    <span class="c-dim">│</span>  <span class="c-dim">│</span> <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>                     <span class="c-dim">│  │</span>  <span class="c-dim">└──────────────────────────────────────────┘</span>  <span class="c-dim">│</span> <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span> Welcome-Message     <span class="c-dim">│  │</span>                                                  <span class="c-dim">│</span> <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>                     <span class="c-dim">│  │</span>  <span class="c-dim">┌ CHAT-AREA (nach Unlock) ──────────────────┐</span>  <span class="c-dim">│</span> <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span> Features:           <span class="c-dim">│  │</span>  <span class="c-dim">│</span>  <span class="c-dim">[ Bot: Welcome Message (Blase) ]</span>           <span class="c-dim">│</span>  <span class="c-dim">│</span> <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span> ✓ Feature 1         <span class="c-dim">│  │</span>  <span class="c-dim">│</span>  <span class="c-dim">[ User: Nachricht (rechts, indigo) ]</span>       <span class="c-dim">│</span>  <span class="c-dim">│</span> <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span> ✓ Feature 2         <span class="c-dim">│  │</span>  <span class="c-dim">│</span>  <span class="c-dim">[ Bot: Antwort (links, weiß, Streaming) ]</span>  <span class="c-dim">│</span>  <span class="c-dim">│</span> <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>                     <span class="c-dim">│  │</span>  <span class="c-dim">│</span>                                              <span class="c-dim">│</span>  <span class="c-dim">│</span> <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span> Modell: GPT-4o      <span class="c-dim">│  │</span>  <span class="c-dim">│</span>  <span class="c-dim">─────────────────────────────────────────</span>   <span class="c-dim">│</span>  <span class="c-dim">│</span> <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span> 🔑 Lizenz: geprüft  <span class="c-dim">│  │</span>  <span class="c-dim">│</span>  <span class="c-dim">[  Nachricht eingeben...   ] [ Senden ▶ ]</span>  <span class="c-dim">│</span>  <span class="c-dim">│</span> <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">└─────────────────────┘  │</span>  <span class="c-dim">└──────────────────────────────────────────┘</span>  <span class="c-dim">│</span> <span class="c-dim">│</span>
+<span class="c-dim">│</span>                           <span class="c-dim">└──────────────────────────────────────────────────┘</span> <span class="c-dim">│</span>
+<span class="c-dim">└──────────────────────────────────────────────────────────────────────────────────┘</span></div>
+
+    <div class="note note-blue" style="margin-top:12px;">
+      <strong>Chat-Widget:</strong> Geladen via <code>/static/chat-widget.js</code>. Sendet Nachrichten an <code>POST /api/chat</code>. Unterstützt Streaming-Antworten (EventSource) und Kontext-Fenster (bis zu 20 Nachrichten).
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- SECTION 10: DASHBOARD                              -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="section" id="s10">
+    <div class="section-header">
+      <div class="section-num">10</div>
+      <div>
+        <div class="section-title">Dashboard / Lizenzbereich <code style="font-size:18px;color:var(--green)">/dashboard</code></div>
+        <div class="section-subtitle">E-Mail-basierte Lizenzverwaltung ohne Login</div>
+      </div>
+    </div>
+
+    <div class="ascii-frame"><span class="c-dim">┌──────────────────────────────────────────────────────────────────────────────────┐</span>
+<span class="c-dim">│</span>  <span class="c-green">🔑 Mein Bereich – Lizenzübersicht</span>                                             <span class="c-dim">│</span>
+<span class="c-dim">│</span>                                                                                  <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">┌──────────────────────────────────────────────────────┐</span>                        <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  📧 E-Mail eingeben                                  <span class="c-dim">│</span>                        <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  [ihre@email.de                        ] [Suchen]    <span class="c-dim">│</span>                        <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">└──────────────────────────────────────────────────────┘</span>                        <span class="c-dim">│</span>
+<span class="c-dim">│</span>                                                                                  <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">──── Ergebnisse (nach API-Call POST /api/license/by-email) ────</span>                <span class="c-dim">│</span>
+<span class="c-dim">│</span>                                                                                  <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">┌──────────────────────────────────────────────────────────────┐</span>               <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  <span class="c-green">Produktname</span>           <span class="c-dim">Typ: Einmalig / Abo</span>   <span class="c-green">[aktiv]</span>         <span class="c-dim">│</span>               <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  Schlüssel: ABCD-1234-EFGH-5678   📋 Kopieren                 <span class="c-dim">│</span>               <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  Erstellt: TT.MM.JJJJ                      <span class="c-dim">[Bot nutzen →]</span>    <span class="c-dim">│</span>               <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">└──────────────────────────────────────────────────────────────┘</span>               <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">(wiederholt für jede Lizenz)</span>                                                   <span class="c-dim">│</span>
+<span class="c-dim">└──────────────────────────────────────────────────────────────────────────────────┘</span></div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- SECTION 11: SUCCESS-SEITEN                         -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="section" id="s11">
+    <div class="section-header">
+      <div class="section-num">11</div>
+      <div>
+        <div class="section-title">Success-Seiten</div>
+        <div class="section-subtitle"><code>/success</code> und <code>/analyse-success</code></div>
+      </div>
+    </div>
+
+    <div class="info-grid">
+      <div>
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:10px;"><code>/success</code> – Bot/Digital-Kauf</h3>
+        <div class="ascii-frame" style="font-size:12px;"><span class="c-dim">┌────────────────────────────────┐</span>
+<span class="c-dim">│</span>  <span class="c-hero">✓ Zahlung erfolgreich!</span>        <span class="c-dim">│</span>
+<span class="c-dim">│</span>                                <span class="c-dim">│</span>
+<span class="c-dim">│</span>  🔑 Dein Lizenzschlüssel:      <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-nav">ABCD-1234-EFGH-5678</span>          <span class="c-dim">│</span>
+<span class="c-dim">│</span>  [📋 Kopieren]                 <span class="c-dim">│</span>
+<span class="c-dim">│</span>                                <span class="c-dim">│</span>
+<span class="c-dim">│</span>  Produkt: Bot-Name             <span class="c-dim">│</span>
+<span class="c-dim">│</span>  [Download / Zugriff]          <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">(nur bei eBooks/Videos)</span>       <span class="c-dim">│</span>
+<span class="c-dim">│</span>                                <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-green">[ Bot jetzt nutzen → ]</span>        <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">[ Weitere Produkte ]</span>          <span class="c-dim">│</span>
+<span class="c-dim">└────────────────────────────────┘</span></div>
+      </div>
+      <div>
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:10px;"><code>/analyse-success</code> – Analysen-Kauf</h3>
+        <div class="ascii-frame" style="font-size:12px;"><span class="c-dim">┌────────────────────────────────┐</span>
+<span class="c-dim">│</span>  <span class="c-amber">📈 Analyse freigeschaltet!</span>    <span class="c-dim">│</span>
+<span class="c-dim">│</span>                                <span class="c-dim">│</span>
+<span class="c-dim">│</span>  🔑 Dein Lizenzschlüssel:      <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-amber">XYZA-9876-BCDE-4321</span>          <span class="c-dim">│</span>
+<span class="c-dim">│</span>  [📋 Kopieren]                 <span class="c-dim">│</span>
+<span class="c-dim">│</span>                                <span class="c-dim">│</span>
+<span class="c-dim">│</span>  Info: Schlüssel aufbewahren!  <span class="c-dim">│</span>
+<span class="c-dim">│</span>                                <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-amber">[ 📈 Analyse jetzt lesen → ]</span>  <span class="c-dim">│</span>
+<span class="c-dim">└────────────────────────────────┘</span></div>
+      </div>
+    </div>
+    <div class="note">
+      <strong>Beide Seiten:</strong> Laden Lizenzdaten via <code>GET /api/[analyse/]success?session_id=…</code> nach dem Page-Load. Zeigen Ladezustand → Erfolg oder Fehler (3 Zustände: loading, success, error).
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- SECTION 12: RECHTLICHE SEITEN                      -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="section" id="s12">
+    <div class="section-header">
+      <div class="section-num">12</div>
+      <div>
+        <div class="section-title">Rechtliche Seiten</div>
+        <div class="section-subtitle"><code>/impressum</code> · <code>/datenschutz</code> · <code>/agb</code></div>
+      </div>
+    </div>
+
+    <p style="color:var(--slate-600);margin-bottom:16px;">Alle drei Seiten folgen demselben simplen Layout: max-w-3xl, weißer Inhaltscontainer, strukturierte Abschnitte mit h2-Überschriften.</p>
+
+    <div class="ascii-frame"><span class="c-dim">┌──────────────────────────────────────────────────────────────────────────────────┐</span>
+<span class="c-dim">│</span>  <span class="c-hero">Seitenname (h1, 3xl, extrabold)</span>   <span class="c-dim">max-w-3xl mx-auto  py-16</span>                  <span class="c-dim">│</span>
+<span class="c-dim">│</span>                                                                                  <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">┌──────────────────────────────────────────────────────────────────────────┐</span>   <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  bg-white  rounded-2xl  shadow-md  p-8                                  <span class="c-dim">│</span>   <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>                                                                          <span class="c-dim">│</span>   <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  <span class="c-hero">1. Abschnittsüberschrift (h2)</span>                                           <span class="c-dim">│</span>   <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  Fließtext...                                                            <span class="c-dim">│</span>   <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>                                                                          <span class="c-dim">│</span>   <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  <span class="c-hero">2. Abschnittsüberschrift (h2)</span>                                           <span class="c-dim">│</span>   <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">│</span>  Fließtext...                                                            <span class="c-dim">│</span>   <span class="c-dim">│</span>
+<span class="c-dim">│</span>  <span class="c-dim">└──────────────────────────────────────────────────────────────────────────┘</span>   <span class="c-dim">│</span>
+<span class="c-dim">└──────────────────────────────────────────────────────────────────────────────────┘</span></div>
+
+    <table style="margin-top:16px;">
+      <thead><tr><th>Seite</th><th>Pflichtinhalt (§)</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td><code>/impressum</code></td><td>§ 5 TMG: Name, Adresse, E-Mail, USt-ID</td><td><span class="badge badge-amber">Platzhalter vorhanden</span></td></tr>
+        <tr><td><code>/datenschutz</code></td><td>DSGVO Art. 13/14: Verantwortlicher, Datenarten, Zwecke</td><td><span class="badge badge-amber">Platzhalter vorhanden</span></td></tr>
+        <tr><td><code>/agb</code></td><td>Vertragsschluss, Widerruf, Haftung, anwendbares Recht</td><td><span class="badge badge-amber">Platzhalter vorhanden</span></td></tr>
+      </tbody>
+    </table>
+    <div class="note" style="margin-top:12px;">
+      <strong>To-Do vor Go-Live:</strong> Adresse, USt-ID und rechtlich geprüfte Texte eintragen. Impressum- und Datenschutzpflicht ab dem ersten öffentlichen Aufruf der Domain.
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- DESIGN-SYSTEM                                      -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num" style="background:linear-gradient(135deg,#f59e0b,#ef4444);">DS</div>
+      <div>
+        <div class="section-title">Design-System &amp; Komponentenbibliothek</div>
+        <div class="section-subtitle">Farben, Typografie, Buttons, Karten</div>
+      </div>
+    </div>
+
+    <div class="info-grid info-grid-3">
+      <div class="info-card">
+        <h4>Primärfarben</h4>
+        <ul>
+          <li>Indigo-600: #6366f1 (Bots, CTAs)</li>
+          <li>Amber-500: #f59e0b (Analysen)</li>
+          <li>Emerald-500: #10b981 (eBooks)</li>
+          <li>Rose-500: #f43f5e (Videos)</li>
+          <li>Slate-900: #0f172a (Nav, Footer)</li>
+        </ul>
+      </div>
+      <div class="info-card">
+        <h4>Typografie (Tailwind)</h4>
+        <ul>
+          <li>Hero H1: text-5xl/6xl extrabold</li>
+          <li>Section H2: text-3xl bold</li>
+          <li>Karten H3: text-lg/xl bold</li>
+          <li>Body: text-sm/base slate-600</li>
+          <li>Badge: text-xs font-medium</li>
+        </ul>
+      </div>
+      <div class="info-card">
+        <h4>Interaktive Elemente</h4>
+        <ul>
+          <li>btn-primary: indigo-Gradient, scale(1.02)</li>
+          <li>card-hover: translateY(-4px)</li>
+          <li>badge-pulse: opacity-Animation</li>
+          <li>Kategorie-Pills: bg wechselt on click</li>
+          <li>Inputs: focus:ring-2 ring-indigo-500</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 style="font-size:15px;font-weight:700;margin:24px 0 12px;">Farb-Legende (Wireframes)</h3>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#818cf8;"></div>Indigo – Navigation, Bots, primäre CTAs</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#fbbf24;"></div>Amber – Analysen, Paywall, sekundäre Highlights</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#34d399;"></div>Grün – Erfolg, eBooks, Bestätigungen</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f87171;"></div>Rot – Videos, Fehler, Warnungen</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#94a3b8;"></div>Slate – Dimme Elemente, sekundärer Text</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#a78bfa;"></div>Bundles/SaaS – Lila Gradient</div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- GENEHMIGUNGSFELD                                   -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="section" style="border: 2px solid var(--primary);">
+    <div class="section-header">
+      <div class="section-num" style="background:linear-gradient(135deg,#10b981,#059669);">✓</div>
+      <div>
+        <div class="section-title">Genehmigung – Meilenstein 1</div>
+        <div class="section-subtitle">Wireframe-Dokumentation zur Abnahme</div>
+      </div>
+    </div>
+
+    <table>
+      <thead><tr><th>Rolle</th><th>Name</th><th>Datum</th><th>Unterschrift / Bestätigung</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Auftraggeber</td>
+          <td>___________________________</td>
+          <td>___________</td>
+          <td>___________________________</td>
+        </tr>
+        <tr>
+          <td>Projektleitung</td>
+          <td>___________________________</td>
+          <td>___________</td>
+          <td>___________________________</td>
+        </tr>
+        <tr>
+          <td>UX/Design</td>
+          <td>___________________________</td>
+          <td>___________</td>
+          <td>___________________________</td>
+        </tr>
+        <tr>
+          <td>Entwicklung</td>
+          <td>mikon28wa / KIPromptsPro</td>
+          <td>22.03.2025</td>
+          <td>✓ Erstellt &amp; geprüft</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="note note-green" style="margin-top:20px;">
+      <strong>Mit Genehmigung dieses Dokuments</strong> wird Meilenstein 1 als abgeschlossen betrachtet und die Entwicklung kann gemäß der hier dokumentierten Seitenstruktur fortgesetzt werden.
+      Änderungen nach Genehmigung erfordern ein Change-Request-Verfahren.
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+</body>
+</html>
