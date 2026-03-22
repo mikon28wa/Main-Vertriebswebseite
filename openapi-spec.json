@@ -1,0 +1,792 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "KIPromptsPro – API Spezifikation",
+    "version": "1.0.0",
+    "description": "Vollständige Request/Response-Schemas aller API-Endpunkte der KIPromptsPro-Plattform.\n\nBasis-URL (Produktion): https://<your-project>.pages.dev\nBasis-URL (Lokal): http://localhost:3000\n\nAuthentifizierung: Lizenzschlüssel (Format: XXXX-XXXX-XXXX-XXXX) werden bei geschützten Endpunkten im Request-Body übergeben.\n\nOpenAI-kompatibler Proxy:\n- Base URL: https://www.genspark.ai/api/llm_proxy/v1\n- Unterstützte Modelle: gpt-5, gpt-5.1, gpt-5.2, gpt-5-mini, gpt-5-nano, gpt-5-codex, gpt-5.2-codex",
+    "contact": {
+      "email": "support@kiprompts.pro"
+    },
+    "license": {
+      "name": "Proprietär"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Lokale Entwicklungsumgebung (Sandbox)"
+    },
+    {
+      "url": "https://{project}.pages.dev",
+      "description": "Cloudflare Pages Produktion",
+      "variables": {
+        "project": {
+          "default": "your-project",
+          "description": "Cloudflare Pages Projektname"
+        }
+      }
+    }
+  ],
+  "tags": [
+    { "name": "Chat",       "description": "KI-Bot Chat-Endpunkte (OpenAI-Proxy)" },
+    { "name": "Checkout",   "description": "Stripe Checkout Sessions für Bots/digitale Produkte" },
+    { "name": "Analyse",    "description": "Analysen kaufen und Paywall-Zugang prüfen" },
+    { "name": "License",    "description": "Lizenzschlüssel verwalten und prüfen" },
+    { "name": "Webhook",    "description": "Stripe Webhook Events verarbeiten" }
+  ],
+  "paths": {
+
+    "/api/chat": {
+      "post": {
+        "tags": ["Chat"],
+        "summary": "Nachricht an einen KI-Bot senden",
+        "description": "Sendet eine User-Nachricht an den angegebenen Bot und gibt die KI-Antwort zurück. Setzt eine gültige Lizenz voraus. Intern wird der OpenAI-kompatible Proxy (gpt-5 etc.) verwendet.",
+        "operationId": "postChat",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ChatRequest" },
+              "example": {
+                "botId": "bot-amapro",
+                "licenseKey": "ABCD-1234-EFGH-5678",
+                "userMessage": "Welchen Tech-Stack empfiehlst du für eine SaaS-App?",
+                "sessionId": "sess_abc123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Erfolgreiche KI-Antwort",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ChatResponse" },
+                "example": {
+                  "reply": "Für eine SaaS-App empfehle ich Next.js + Supabase + Stripe...",
+                  "sessionId": "sess_abc123",
+                  "usage": { "totalTokens": 312 }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ungültige Eingabe",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": { "error": "botId und licenseKey erforderlich" }
+              }
+            }
+          },
+          "401": {
+            "description": "Lizenz ungültig oder abgelaufen",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": { "error": "Lizenz ungültig" }
+              }
+            }
+          },
+          "403": {
+            "description": "Lizenz gilt nicht für diesen Bot",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": { "error": "Lizenz gilt nicht für diesen Bot" }
+              }
+            }
+          },
+          "500": {
+            "description": "Interner Serverfehler / OpenAI-Proxy-Fehler",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/api/checkout": {
+      "post": {
+        "tags": ["Checkout"],
+        "summary": "Stripe Checkout Session für Bot/Digitalprodukt starten",
+        "description": "Erstellt eine Stripe Checkout Session für einen Bot oder ein digitales Produkt. Gibt die Checkout-URL zurück, zu der der Browser weitergeleitet wird.",
+        "operationId": "postCheckout",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CheckoutRequest" },
+              "example": {
+                "productId": "bot-amapro",
+                "email": "kunde@beispiel.de"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Checkout Session erstellt",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CheckoutResponse" },
+                "example": {
+                  "sessionId": "cs_test_a1b2c3d4e5f6",
+                  "url": "https://checkout.stripe.com/pay/cs_test_a1b2c3d4e5f6"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehlende oder ungültige Parameter",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": { "error": "productId und email erforderlich" }
+              }
+            }
+          },
+          "404": {
+            "description": "Produkt nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": { "error": "Produkt nicht gefunden" }
+              }
+            }
+          },
+          "500": {
+            "description": "Stripe-Fehler",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": { "error": "Checkout fehlgeschlagen" }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/api/checkout/success": {
+      "get": {
+        "tags": ["Checkout"],
+        "summary": "Lizenz nach Stripe-Zahlung erstellen",
+        "description": "Wird von der Stripe-Erfolgsseite aufgerufen. Prüft die Zahlung, erstellt einen Lizenzschlüssel und speichert ihn in KV.",
+        "operationId": "getCheckoutSuccess",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "query",
+            "required": true,
+            "description": "Stripe Checkout Session ID",
+            "schema": { "type": "string", "example": "cs_test_a1b2c3d4e5f6" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lizenz erfolgreich erstellt oder bereits vorhanden",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/LicenseSuccessResponse" },
+                "example": {
+                  "license": {
+                    "key": "ABCD-1234-EFGH-5678",
+                    "productId": "bot-amapro",
+                    "pricingType": "one_time",
+                    "status": "active",
+                    "createdAt": "2025-03-22T10:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "session_id fehlt oder Metadaten unvollständig",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "402": {
+            "description": "Zahlung nicht abgeschlossen",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": { "error": "Zahlung nicht abgeschlossen" }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/api/analyse/checkout": {
+      "post": {
+        "tags": ["Analyse"],
+        "summary": "Stripe Checkout Session für eine Analyse starten",
+        "description": "Erstellt eine Stripe Checkout Session für eine kostenpflichtige Analyse. Success-URL zeigt auf /analyse-success.",
+        "operationId": "postAnalyseCheckout",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AnalyseCheckoutRequest" },
+              "example": {
+                "analyseId": "analyse-ki-prompt-engineering-2025",
+                "email": "kunde@beispiel.de"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Checkout Session erstellt",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CheckoutResponse" },
+                "example": {
+                  "sessionId": "cs_test_analyse_xyz",
+                  "url": "https://checkout.stripe.com/pay/cs_test_analyse_xyz"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehlende oder ungültige Parameter",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "404": {
+            "description": "Analyse nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" },
+                "example": { "error": "Analyse nicht gefunden" }
+              }
+            }
+          },
+          "500": {
+            "description": "Stripe-Fehler",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/api/analyse/access": {
+      "get": {
+        "tags": ["Analyse"],
+        "summary": "Paywall-Zugang für eine Analyse prüfen",
+        "description": "Prüft ob ein Lizenzschlüssel Zugang zu einer bestimmten Analyse gewährt. Bei gültigem Zugang wird der vollständige HTML-Inhalt zurückgegeben.",
+        "operationId": "getAnalyseAccess",
+        "parameters": [
+          {
+            "name": "analyseId",
+            "in": "query",
+            "required": true,
+            "description": "ID der Analyse",
+            "schema": { "type": "string", "example": "analyse-ki-prompt-engineering-2025" }
+          },
+          {
+            "name": "licenseKey",
+            "in": "query",
+            "required": true,
+            "description": "Lizenzschlüssel (Format: XXXX-XXXX-XXXX-XXXX)",
+            "schema": { "type": "string", "example": "ABCD-1234-EFGH-5678" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Zugangsprüfung abgeschlossen (hasAccess kann true oder false sein)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnalyseAccessResponse" },
+                "examples": {
+                  "zugang_gewährt": {
+                    "summary": "Zugang gewährt",
+                    "value": {
+                      "hasAccess": true,
+                      "contentHtml": "<div class=\"analyse-content\"><h1>Prompt Engineering 2025...</h1>...</div>",
+                      "title": "Prompt Engineering 2025: Strategien für maximale KI-Leistung",
+                      "lastUpdated": "2025-03-01"
+                    }
+                  },
+                  "zugang_verweigert": {
+                    "summary": "Zugang verweigert",
+                    "value": {
+                      "hasAccess": false,
+                      "error": "Lizenzschlüssel nicht gefunden"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Fehlende Parameter",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnalyseAccessResponse" },
+                "example": { "hasAccess": false, "error": "analyseId und licenseKey erforderlich" }
+              }
+            }
+          },
+          "404": {
+            "description": "Analyse nicht gefunden",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnalyseAccessResponse" },
+                "example": { "hasAccess": false, "error": "Analyse nicht gefunden" }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/api/analyse/success": {
+      "get": {
+        "tags": ["Analyse"],
+        "summary": "Lizenz nach Stripe-Zahlung für Analyse erstellen",
+        "description": "Wird nach erfolgreicher Stripe-Zahlung für eine Analyse aufgerufen. Erstellt einen Lizenzschlüssel.",
+        "operationId": "getAnalyseSuccess",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "query",
+            "required": true,
+            "description": "Stripe Checkout Session ID",
+            "schema": { "type": "string", "example": "cs_test_analyse_xyz" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lizenz erfolgreich erstellt",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/LicenseSuccessResponse" },
+                "example": {
+                  "license": {
+                    "key": "XYZA-9876-BCDE-4321",
+                    "productId": "analyse-ki-prompt-engineering-2025",
+                    "pricingType": "one_time",
+                    "status": "active",
+                    "createdAt": "2025-03-22T10:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Fehlende Parameter", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } },
+          "402": { "description": "Zahlung nicht abgeschlossen", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } },
+          "500": { "description": "Serverfehler", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    },
+
+    "/api/license/check": {
+      "post": {
+        "tags": ["License"],
+        "summary": "Lizenzschlüssel prüfen",
+        "description": "Prüft ob ein Lizenzschlüssel gültig ist und für welches Produkt er gilt.",
+        "operationId": "postLicenseCheck",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LicenseCheckRequest" },
+              "example": {
+                "licenseKey": "ABCD-1234-EFGH-5678"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Lizenzdaten zurückgegeben",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/LicenseCheckResponse" },
+                "example": {
+                  "valid": true,
+                  "productId": "bot-amapro",
+                  "pricingType": "one_time",
+                  "status": "active",
+                  "createdAt": "2025-03-22T10:00:00.000Z",
+                  "totalMessages": 42
+                }
+              }
+            }
+          },
+          "400": { "description": "Fehlende Parameter", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } },
+          "404": { "description": "Lizenz nicht gefunden", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    },
+
+    "/api/license/by-email": {
+      "post": {
+        "tags": ["License"],
+        "summary": "Alle Lizenzen einer E-Mail-Adresse abrufen",
+        "description": "Gibt alle Lizenzschlüssel zurück, die mit einer E-Mail-Adresse verknüpft sind.",
+        "operationId": "postLicenseByEmail",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LicenseByEmailRequest" },
+              "example": { "email": "kunde@beispiel.de" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Lizenzliste",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/LicensesByEmailResponse" },
+                "example": {
+                  "licenses": [
+                    {
+                      "key": "ABCD-1234-EFGH-5678",
+                      "productId": "bot-amapro",
+                      "pricingType": "one_time",
+                      "status": "active",
+                      "createdAt": "2025-03-22T10:00:00.000Z"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": { "description": "Fehlende E-Mail", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    },
+
+    "/api/webhook": {
+      "post": {
+        "tags": ["Webhook"],
+        "summary": "Stripe Webhook Events empfangen",
+        "description": "Empfängt und verarbeitet Stripe Webhook Events. Erfordert gültige Stripe-Webhook-Signatur im Header `stripe-signature`.\n\nVerarbeitete Events:\n- `checkout.session.completed` – Zahlung abgeschlossen\n- `customer.subscription.deleted` – Abo gekündigt\n- `invoice.payment_failed` – Zahlung fehlgeschlagen",
+        "operationId": "postWebhook",
+        "parameters": [
+          {
+            "name": "stripe-signature",
+            "in": "header",
+            "required": true,
+            "description": "Stripe Webhook Signatur zur Verifikation",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/StripeWebhookEvent" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Event verarbeitet",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "received": { "type": "boolean", "example": true } } }
+              }
+            }
+          },
+          "400": { "description": "Signatur ungültig oder Payload fehlerhaft", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } } }
+        }
+      }
+    }
+  },
+
+  "components": {
+    "schemas": {
+
+      "ChatRequest": {
+        "type": "object",
+        "required": ["botId", "licenseKey", "userMessage"],
+        "properties": {
+          "botId": {
+            "type": "string",
+            "description": "ID des Bots aus dem Bot-Registry",
+            "example": "bot-amapro"
+          },
+          "licenseKey": {
+            "type": "string",
+            "description": "Gültiger Lizenzschlüssel (Format: XXXX-XXXX-XXXX-XXXX)",
+            "pattern": "^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$",
+            "example": "ABCD-1234-EFGH-5678"
+          },
+          "userMessage": {
+            "type": "string",
+            "description": "Nachricht des Nutzers an den Bot",
+            "minLength": 1,
+            "maxLength": 4000,
+            "example": "Welchen Tech-Stack empfiehlst du für eine SaaS-App?"
+          },
+          "sessionId": {
+            "type": "string",
+            "description": "Optionale Session-ID für Gesprächskontext (wird bei neuer Session automatisch generiert)",
+            "example": "sess_abc123"
+          }
+        }
+      },
+
+      "ChatResponse": {
+        "type": "object",
+        "required": ["reply", "sessionId"],
+        "properties": {
+          "reply": {
+            "type": "string",
+            "description": "Antwort des KI-Bots",
+            "example": "Für eine SaaS-App empfehle ich Next.js + Supabase + Stripe..."
+          },
+          "sessionId": {
+            "type": "string",
+            "description": "Session-ID (neu generiert oder übergeben)",
+            "example": "sess_abc123"
+          },
+          "usage": {
+            "type": "object",
+            "description": "Token-Verbrauch (optional)",
+            "properties": {
+              "totalTokens": {
+                "type": "integer",
+                "description": "Gesamte verbrauchte Tokens",
+                "example": 312
+              }
+            }
+          }
+        }
+      },
+
+      "CheckoutRequest": {
+        "type": "object",
+        "required": ["productId", "email"],
+        "properties": {
+          "productId": {
+            "type": "string",
+            "description": "ID des Produkts (Bot, eBook, Video etc.)",
+            "example": "bot-amapro"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "E-Mail-Adresse des Käufers",
+            "example": "kunde@beispiel.de"
+          }
+        }
+      },
+
+      "AnalyseCheckoutRequest": {
+        "type": "object",
+        "required": ["analyseId", "email"],
+        "properties": {
+          "analyseId": {
+            "type": "string",
+            "description": "ID der Analyse aus dem Analysen-Registry",
+            "example": "analyse-ki-prompt-engineering-2025"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "E-Mail-Adresse des Käufers",
+            "example": "kunde@beispiel.de"
+          }
+        }
+      },
+
+      "CheckoutResponse": {
+        "type": "object",
+        "required": ["sessionId", "url"],
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "description": "Stripe Checkout Session ID",
+            "example": "cs_test_a1b2c3d4e5f6"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Stripe Hosted Checkout URL – Browser zu dieser URL weiterleiten",
+            "example": "https://checkout.stripe.com/pay/cs_test_a1b2c3d4e5f6"
+          }
+        }
+      },
+
+      "AnalyseAccessResponse": {
+        "type": "object",
+        "required": ["hasAccess"],
+        "properties": {
+          "hasAccess": {
+            "type": "boolean",
+            "description": "true = Zugang gewährt, false = kein Zugang"
+          },
+          "contentHtml": {
+            "type": "string",
+            "description": "Vollständiger HTML-Inhalt der Analyse (nur wenn hasAccess = true)",
+            "example": "<div class=\"analyse-content\"><h1>...</h1></div>"
+          },
+          "title": {
+            "type": "string",
+            "description": "Titel der Analyse (nur wenn hasAccess = true)",
+            "example": "Prompt Engineering 2025"
+          },
+          "lastUpdated": {
+            "type": "string",
+            "format": "date",
+            "description": "Letztes Aktualisierungsdatum (ISO, nur wenn hasAccess = true)",
+            "example": "2025-03-01"
+          },
+          "error": {
+            "type": "string",
+            "description": "Fehlermeldung (nur wenn hasAccess = false)",
+            "example": "Lizenzschlüssel nicht gefunden"
+          }
+        }
+      },
+
+      "LicenseCheckRequest": {
+        "type": "object",
+        "required": ["licenseKey"],
+        "properties": {
+          "licenseKey": {
+            "type": "string",
+            "description": "Lizenzschlüssel (Format: XXXX-XXXX-XXXX-XXXX)",
+            "pattern": "^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$",
+            "example": "ABCD-1234-EFGH-5678"
+          }
+        }
+      },
+
+      "LicenseCheckResponse": {
+        "type": "object",
+        "properties": {
+          "valid": { "type": "boolean", "description": "Ob die Lizenz gültig ist", "example": true },
+          "productId": { "type": "string", "description": "Produkt-ID der Lizenz", "example": "bot-amapro" },
+          "pricingType": { "$ref": "#/components/schemas/PricingType" },
+          "status": { "$ref": "#/components/schemas/LicenseStatus" },
+          "createdAt": { "type": "string", "format": "date-time", "example": "2025-03-22T10:00:00.000Z" },
+          "expiresAt": { "type": "string", "format": "date-time", "nullable": true, "example": null },
+          "totalMessages": { "type": "integer", "description": "Anzahl gesendeter Nachrichten", "example": 42 },
+          "lastChatAt": { "type": "string", "format": "date-time", "nullable": true }
+        }
+      },
+
+      "LicenseByEmailRequest": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "kunde@beispiel.de"
+          }
+        }
+      },
+
+      "LicensesByEmailResponse": {
+        "type": "object",
+        "properties": {
+          "licenses": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/LicenseSummary" }
+          }
+        }
+      },
+
+      "LicenseSummary": {
+        "type": "object",
+        "properties": {
+          "key": { "type": "string", "example": "ABCD-1234-EFGH-5678" },
+          "productId": { "type": "string", "example": "bot-amapro" },
+          "pricingType": { "$ref": "#/components/schemas/PricingType" },
+          "status": { "$ref": "#/components/schemas/LicenseStatus" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+
+      "LicenseSuccessResponse": {
+        "type": "object",
+        "properties": {
+          "license": { "$ref": "#/components/schemas/LicenseSummary" },
+          "downloadUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Download-URL (nur für eBooks/Videos)",
+            "nullable": true
+          }
+        }
+      },
+
+      "StripeWebhookEvent": {
+        "type": "object",
+        "description": "Stripe Event-Objekt (wird von Stripe gesendet)",
+        "properties": {
+          "id": { "type": "string", "example": "evt_1ABC..." },
+          "type": {
+            "type": "string",
+            "enum": [
+              "checkout.session.completed",
+              "customer.subscription.deleted",
+              "invoice.payment_failed"
+            ],
+            "example": "checkout.session.completed"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "object": {
+                "type": "object",
+                "description": "Das betroffene Stripe-Objekt (Session, Subscription oder Invoice)"
+              }
+            }
+          },
+          "created": { "type": "integer", "description": "Unix Timestamp", "example": 1711101600 },
+          "livemode": { "type": "boolean", "example": false }
+        }
+      },
+
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Fehlermeldung",
+            "example": "Ungültige E-Mail-Adresse"
+          }
+        }
+      },
+
+      "PricingType": {
+        "type": "string",
+        "enum": ["one_time", "subscription"],
+        "description": "Zahlungsmodell: Einmalkauf oder Abonnement",
+        "example": "one_time"
+      },
+
+      "LicenseStatus": {
+        "type": "string",
+        "enum": ["active", "cancelled", "expired"],
+        "description": "Status der Lizenz",
+        "example": "active"
+      }
+    }
+  }
+}
