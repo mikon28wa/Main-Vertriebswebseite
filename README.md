@@ -1,180 +1,179 @@
-# KIPromptsPro – Marketplace für KI-Systemprompts
+# Main-Vertriebswebseite
 
-## Projektübersicht
-Vollständige E-Commerce-Plattform für den Verkauf von KI-Bots, eBooks, Videokursen, Whitepapers und SaaS-Produkten – mit integriertem Stripe-Zahlungsmodul und Lizenzverwaltung.
-
-## Live-URL (Sandbox)
-🔗 https://3000-igymclsj1nhsoe9s9xydr-3844e1b6.sandbox.novita.ai
+> **Verkaufsplattform für alle Produkte** – Eine zentrale, moderne E-Commerce-Plattform für den Verkauf von Software, digitalen Produkten und Dienstleistungen.
 
 ---
 
-## Implementierte Features
+## 📌 Über das Projekt
 
-### ✅ Stripe Zahlungsmodul
-- **Einmalkäufe** (`payment` mode) mit lebenslangem Zugriff
-- **Abonnements** (`subscription` mode) monatlich/jährlich, jederzeit kündbar
-- Automatische Checkout-Session-Erstellung via Stripe API
-- Webhook-Handler für alle relevanten Stripe-Events
-- Stripe Kundenportal (Self-Service für Abo-Verwaltung)
+Die **Main-Vertriebswebseite** ist eine **vollständige Verkaufsplattform**, die es dir ermöglicht, alle deine Produkte (Software, E-Books, Kurse, SaaS-Lösungen, etc.) an einem Ort anzubieten. Die Plattform ist **responsiv**, **benutzerfreundlich** und **erweiterbar**, um den Anforderungen moderner Online-Verkäufe gerecht zu werden.
 
-### ✅ Produkttypen
-| Typ | Beschreibung |
-|-----|-------------|
-| `bot` | KI-Bots mit Systemprompt-Konfiguration |
-| `ebook` | eBooks als PDF-Download |
-| `whitepaper` | B2B-Studien und Analysen |
-| `video` | Videokurse (Streaming/LMS-Link) |
-| `bundle` | Gebündelte Produktpakete |
-| `saas` | SaaS-Produktzugänge (vorbereitet) |
-
-### ✅ Lizenzsystem (Cloudflare KV)
-- Automatische Generierung von Lizenzschlüsseln (Format: `XXXX-XXXX-XXXX-XXXX`)
-- Speicherung in Cloudflare KV mit E-Mail-Index
-- Statusverwaltung: `active` / `cancelled` / `expired`
-- Abonnement-ID-Mapping für Webhook-Updates
-
-### ✅ Seiten & Routen
-| URL | Beschreibung |
-|-----|-------------|
-| `/` | Startseite mit Herobereich und Featured Products |
-| `/bots` | KI-Bot Bibliothek |
-| `/digital` | eBooks, Kurse, Whitepapers |
-| `/product/:id` | Produktdetailseite mit Checkout-Formular |
-| `/success` | Erfolgsseite nach Zahlung (zeigt Lizenzschlüssel) |
-| `/cancel` | Abbruchseite |
-| `/dashboard` | Lizenzübersicht & Verifizierung |
-
-### ✅ API-Endpunkte
-| Endpunkt | Methode | Beschreibung |
-|----------|---------|-------------|
-| `/api/checkout` | POST | Stripe Checkout Session erstellen |
-| `/api/checkout/success` | GET | Lizenz nach Zahlung generieren |
-| `/api/webhook` | POST | Stripe Webhook Handler |
-| `/api/license/verify` | GET | Einzelne Lizenz prüfen |
-| `/api/license/lookup` | POST | Alle Lizenzen per E-Mail abrufen |
-| `/api/portal` | POST | Stripe Kundenportal öffnen |
+### ✨ Features
+- **Produktkatalog**: Übersichtliche Darstellung aller Produkte mit Kategorien, Suchfunktion und Filteroptionen.
+- **Zahlungsabwicklung**: Integration von Zahlungsanbietern wie **Stripe, PayPal oder Banküberweisung**.
+- **Benutzerverwaltung**: Registrierung, Login und Profilverwaltung für Kunden.
+- **Bestellhistorie**: Kunden können ihre Bestellungen einsehen und verwalten.
+- **Admin-Dashboard**: Verwaltung von Produkten, Bestellungen und Kunden.
+- **Responsive Design**: Optimiert für Desktop, Tablet und mobile Geräte.
+- **SEO-freundlich**: Suchmaschinenoptimierte Struktur für bessere Sichtbarkeit.
 
 ---
 
-## Dateisstruktur
+## 🚀 Schnellstart
+
+### Voraussetzungen
+- **Node.js** (Version 18 oder höher)
+- **npm** oder **yarn** (Paketmanager)
+- **Git** (für die Versionskontrolle)
+- **Hosting-Dienst** (z. B. Vercel, Netlify, Cloudflare Pages, oder ein eigener Server)
+
+### Installation
+
+1. **Repository klonen**:
+   ```bash
+   git clone https://github.com/mikon28wa/Main-Vertriebswebseite.git
+   cd Main-Vertriebswebseite
+   ```
+
+2. **Abhängigkeiten installieren**:
+   ```bash
+   npm install
+   ```
+
+3. **Umgebungsvariablen konfigurieren**:
+   - Erstelle eine `.env`-Datei im Projektverzeichnis.
+   - Füge die erforderlichen Variablen hinzu (z. B. API-Schlüssel für Zahlungsanbieter, Datenbankverbindungen).
+   - Beispiel:
+     ```env
+     STRIPE_SECRET_KEY=dein_stripe_secret_key
+     DATABASE_URL=deine_datenbank_url
+     ```
+
+4. **Lokale Entwicklung starten**:
+   ```bash
+   npm run dev
+   ```
+   Die Anwendung ist dann unter `http://localhost:3000` erreichbar.
+
+---
+
+## 📂 Projektstruktur
+
 ```
-webapp/
+Main-Vertriebswebseite/
+├── public/              # Statische Dateien (Bilder, Fonts, etc.)
+│   ├── images/
+│   └── favicon.ico
 ├── src/
-│   ├── index.tsx          # Hauptapp + alle Frontend-Seiten
-│   ├── routes/api.ts      # Alle API-Endpunkte
-│   ├── lib/
-│   │   ├── stripe.ts      # Stripe-Modul (Checkout, Webhooks, Portal)
-│   │   ├── licenses.ts    # Lizenzverwaltung (KV-Storage)
-│   │   └── products.ts    # Produktkatalog (hier Produkte eintragen)
-│   └── types/index.ts     # TypeScript-Typdefinitionen
-├── .dev.vars              # Lokale Secrets (NICHT in Git)
-├── wrangler.jsonc         # Cloudflare-Konfiguration
-└── ecosystem.config.cjs   # PM2-Konfiguration
+│   ├── components/      # Wiederverwendbare UI-Komponenten
+│   │   ├── Header.tsx
+│   │   ├── Footer.tsx
+│   │   └── ProductCard.tsx
+│   ├── pages/           # Seiten der Anwendung
+│   │   ├── Home.tsx
+│   │   ├── Products.tsx
+│   │   ├── ProductDetail.tsx
+│   │   ├── Checkout.tsx
+│   │   ├── Dashboard.tsx
+│   │   └── Admin.tsx
+│   ├── styles/          # CSS/Styling-Dateien
+│   │   ├── globals.css
+│   │   └── theme.css
+│   ├── utils/           # Hilfsfunktionen und Utilities
+│   │   ├── api.ts
+│   │   └── helpers.ts
+│   ├── types/           # TypeScript-Typdefinitionen
+│   │   └── index.ts
+│   ├── App.tsx          # Hauptkomponente der Anwendung
+│   └── main.tsx         # Einstiegspunkt der Anwendung
+├── .env.example         # Beispiel für Umgebungsvariablen
+├── .gitignore           # Git-Ignore-Regeln
+├── package.json         # Projektabhängigkeiten und Skripte
+├── tsconfig.json        # TypeScript-Konfiguration
+└── README.md            # Diese Datei
 ```
 
 ---
 
-## Setup-Anleitung
+## 🛠️ Anpassung
 
-### 1. Stripe konfigurieren
+### Produkte hinzufügen
+1. **Neues Produkt erstellen**:
+   - Füge ein neues Objekt im `products`-Array in `src/utils/products.ts` hinzu.
+   - Beispiel:
+     ```typescript
+     {
+       id: "produkt-id",
+       name: "Produktname",
+       description: "Beschreibung des Produkts",
+       price: 29.99,
+       category: "Software",
+       image: "/images/produktbild.jpg",
+       available: true,
+     }
+     ```
 
-```bash
-# Stripe Dashboard: https://dashboard.stripe.com
-# Test-Keys aus: https://dashboard.stripe.com/test/apikeys
-```
+2. **Kategorien verwalten**:
+   - Passe die Kategorien in `src/utils/categories.ts` an.
 
-Lokale Entwicklung – `.dev.vars` befüllen:
-```
-STRIPE_SECRET_KEY=sk_test_DEIN_KEY
-STRIPE_WEBHOOK_SECRET=whsec_DEIN_SECRET
-```
-
-### 2. Produkte in Stripe anlegen
-1. Stripe Dashboard → Products → Add Product
-2. Price ID (`price_xxx`) kopieren
-3. In `src/lib/products.ts` bei `stripePriceId` eintragen
-
-### 3. Cloudflare KV-Namespace erstellen
-
-```bash
-npx wrangler kv:namespace create webapp_KV
-npx wrangler kv:namespace create webapp_KV --preview
-```
-
-KV-IDs in `wrangler.jsonc` eintragen (Kommentar entfernen):
-```jsonc
-"kv_namespaces": [
-  {
-    "binding": "KV",
-    "id": "DEINE_PRODUCTION_KV_ID",
-    "preview_id": "DEINE_PREVIEW_KV_ID"
-  }
-]
-```
-
-### 4. Stripe Webhook einrichten
-
-```bash
-# Lokal testen mit Stripe CLI:
-stripe listen --forward-to localhost:3000/api/webhook
-
-# Webhook-Secret in .dev.vars eintragen
-```
-
-Produktions-Webhook:
-- URL: `https://dein-projekt.pages.dev/api/webhook`
-- Events: `checkout.session.completed`, `invoice.payment_succeeded`, `invoice.payment_failed`, `customer.subscription.deleted`, `customer.subscription.updated`
-
-### 5. Deployment zu Cloudflare Pages
-
-```bash
-npm run build
-npx wrangler pages project create webapp --production-branch main
-npx wrangler pages deploy dist --project-name webapp
-
-# Secrets setzen:
-npx wrangler pages secret put STRIPE_SECRET_KEY --project-name webapp
-npx wrangler pages secret put STRIPE_WEBHOOK_SECRET --project-name webapp
-```
+### Design anpassen
+- **Farben und Stile**: Bearbeite die Dateien in `src/styles/` (z. B. `globals.css` oder `theme.css`).
+- **Komponenten**: Passe die UI-Komponenten in `src/components/` an.
 
 ---
 
-## Produkte hinzufügen
+## 🌐 Hosting-Optionen
 
-Neue Produkte in `src/lib/products.ts` im Array `PRODUCTS` eintragen:
+| Anbieter | Anleitung | Kosten |
+|----------|-----------|--------|
+| **Vercel** | [Dokumentation](https://vercel.com/docs) | Kostenlos (mit Premium-Optionen) |
+| **Netlify** | [Dokumentation](https://docs.netlify.com/) | Kostenlos (mit Premium-Optionen) |
+| **Cloudflare Pages** | [Dokumentation](https://developers.cloudflare.com/pages/) | Kostenlos |
+| **Eigener Server** | Node.js/Express oder statisches Hosting | Abhängig vom Anbieter |
 
-```typescript
-{
-  id: 'bot-mein-neuer-bot',          // Eindeutige ID
-  name: 'Mein neuer Bot',
-  description: 'Beschreibung...',
-  type: 'bot',                        // bot|ebook|whitepaper|video|bundle|saas
-  pricingType: 'one_time',            // one_time | subscription
-  price: 2900,                        // Preis in Cent (29,00 €)
-  currency: 'eur',
-  stripePriceId: 'price_xxx',        // Aus Stripe Dashboard
-  stripeProductId: 'prod_xxx',
-  features: ['Feature 1', 'Feature 2'],
-  category: 'Kategoriename',
-  active: true,
-  botConfig: {                        // Nur für type: 'bot'
-    systemPrompt: 'Dein Systemprompt...',
-    model: 'gpt-4o',
-    temperature: 0.7,
-    welcomeMessage: 'Hallo!',
-    iframeAllowed: true
-  }
-}
-```
+### Deployment mit Vercel
+1. **Repository mit Vercel verbinden**:
+   - Erstelle ein Konto auf [Vercel](https://vercel.com/).
+   - Importiere das Repository `Main-Vertriebswebseite`.
+   - Vercel erkennt automatisch die Einstellungen und schlägt eine Konfiguration vor.
+
+2. **Umgebungsvariablen hinzufügen**:
+   - Füge die erforderlichen Umgebungsvariablen (z. B. `STRIPE_SECRET_KEY`) in den Vercel-Projekteinstellungen hinzu.
+
+3. **Bereitstellen**:
+   - Klicke auf **Deploy**. Die Anwendung wird automatisch gebaut und bereitgestellt.
 
 ---
 
-## Tech Stack
-- **Framework**: Hono 4 (Cloudflare Workers)
-- **Build**: Vite 6
-- **Deployment**: Cloudflare Pages
-- **Zahlung**: Stripe (Checkout Sessions + Webhooks)
-- **Storage**: Cloudflare KV (Lizenzen)
-- **Frontend**: Tailwind CSS (CDN) + FontAwesome
+## 🤝 Beitrag leisten
 
-## Status: ✅ Bereit für Deployment
+Beiträge sind willkommen! Falls du Verbesserungen oder Erweiterungen vorschlagen möchtest:
+
+1. **Fork** das Repository.
+2. **Feature-Branch erstellen** (`git checkout -b feature/neue-funktion`).
+3. **Änderungen committen** (`git commit -m "Füge neue Funktion hinzu"`).
+4. **Branch pushen** (`git push origin feature/neue-funktion`).
+5. **Pull Request öffnen**.
+
+---
+
+## 📄 Lizenz
+
+Dieses Projekt steht unter der **MIT-Lizenz**. Siehe [LICENSE](LICENSE) für weitere Informationen.
+
+---
+
+## 📞 Support
+
+- **Fragen oder Probleme?** Öffne ein [Issue](https://github.com/mikon28wa/Main-Vertriebswebseite/issues) in diesem Repository.
+- **Kontakt**: [Michael Konradi](https://github.com/mikon28wa) (Projektverantwortlicher).
+
+---
+
+## 🏗️ Technologien
+
+- **Frontend**: React, TypeScript, Tailwind CSS
+- **Backend**: Node.js, Express (falls benötigt)
+- **Zahlungsabwicklung**: Stripe, PayPal
+- **Datenbank**: Firebase, Supabase oder MongoDB (optional)
+- **Hosting**: Vercel, Netlify, Cloudflare Pages
